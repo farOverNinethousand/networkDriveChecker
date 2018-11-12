@@ -48,7 +48,12 @@ Beispiel: Du startest dieses Script jede Woche 1x, Fehlerdialoge sind aktiviert 
 Sobald das Script das dritte Mal infolge (= in Woche 3) gestartet wird und es Fehler gibt, wird so ein Dialog angezeigt:
 ![alt text](https://raw.githubusercontent.com/farOverNinethousand/networkDriveChecker/master/Screenshots/2018_11_06_ErrorDialog.png "Screenshot FehlerDialog")
 
-3. Erweiterte Einstellungen
+3. Einstellungen zu Wartezeiten
+
+Siehe Abschnitt "REM Wartezeiten" im Script - dort sind Erklärungen zu jeder der Einstellungsmöglichkeiten vorhanden.
+Diese Werte sollten nur verstellt werden wenn man weiß, was man tut.
+
+4. Erweiterte Einstellungen
 
 SET enable_debug_mode=true|false --> Zeigt genauere Ausgaben zu dem was aktuell passiert.
 Ist für normale Anwender unnötig, da das zu sehr vielen Ausgaben führt und man dann schnell den Überblick verliert.

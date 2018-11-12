@@ -60,7 +60,7 @@ REM Wartezeit nach der das Fenster bei erfolgreicher Ausfuehrung geschlossen wir
 SET /A waittime_seconds_on_successful_ending=10
 REM Wartezeit nach der das Fenster bei fehlerhafter Ausfuehrung geschlossen wird
 SET /A waittime_seconds_on_bad_ending=120
-REM Wartezeit nach jeder ERFOLGREICHEN Account-Pruefung
+REM Wartezeit nach jeder ERFOLGREICHEN Account-Pruefung (ansonsten geht es sofort mit dem nächsten Account weiter)
 SET /A waittime_seconds_between_successful_account_checks=5
 
 REM Zugangsdaten hier eintragen
