@@ -2,7 +2,7 @@
 REM Main purpose: Keep Bitrix24.de Accounts alive: https://www.mydealz.de/deals/100gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-1232057
 
 :start
-title NetworkDriveChecker v.1.0 by over_nine_thousand - MyDealz
+title NetworkDriveChecker v.1.10 by over_nine_thousand - MyDealz
 
 REM recommended according to: http://steve-jansen.github.io/guides/windows-batch-scripting/part-2-variables.html
 SETLOCAL ENABLEEXTENSIONS
@@ -24,6 +24,8 @@ SET driveletter=
 
 REM Name der Testdatei hier festlegen, ansonsten wird ein zufaelliger Name generiert (Beispiel: SET filename=testdatei.txt)
 SET filename=
+REM Mit folgendem String werden Ausgaben manchmal voneinander getrennt
+SET separator=-------------------------------------------------------
 
 REM Dateinamen saemtlicher vom Script eventuell zu erstellenden Dateien
 REM Dateiname des Logs
@@ -46,6 +48,20 @@ REM Zeige FehlerDialog falls das Script >= max_failures_until_error fehlschlaegt
 SET display_error_dialog_on_too_many_failures=true
 REM Zeige unter Windows XP keine Fehlermeldung nach dem Start sondern versuche es trotzdem (wird idR nicht funktionieren)
 SET force_allow_windows_xp=false
+
+REM Wartezeiten
+REM Wartezeit vor dem Start (nuetzlich bei der Ausfuehrung direkt nach Benutzeranmeldung, da es einige Sekunden dauern kann, bis eine Internetverbindung verfuegbar ist)
+SET /A waittime_seconds_before_start=8
+REM Wartezeit fuer die "Willkommen" Meldung beim ersten Start des Scripts
+SET /A waittime_seconds_display_welcome_message=10
+REM Wartezeit bei Fehlern nach denen das Script weiter ausgefuehrt wird ("Nicht-fatale-Fehler")
+SET /A waittime_seconds_continue_on_non_fatal_error=60
+REM Wartezeit nach der das Fenster bei erfolgreicher Ausfuehrung geschlossen wird
+SET /A waittime_seconds_on_successful_ending=10
+REM Wartezeit nach der das Fenster bei fehlerhafter Ausfuehrung geschlossen wird
+SET /A waittime_seconds_on_bad_ending=120
+REM Wartezeit nach jeder ERFOLGREICHEN Account-Pruefung
+SET /A waittime_seconds_between_successful_account_checks=5
 
 REM Zugangsdaten hier eintragen
 SET "domains[0]=test1.bitrix24.de"
@@ -88,9 +104,12 @@ if exist !logfile_test_write_access_name! (
 	echo Moegliche Fehlerursachen und Loesungen:
 	echo 1. Du verwendest das Script per Windows Zeitplaner? Gehe sicher, dass es als Admin gestartet wird falls es sich nicht unterhalb des Benutzerordners befindet ^("C:\Users\DeinBenutzername\bla"^) oder gib in der Aufgabenplanung im Feld "Starten in" einen Pfad unterhalb des Benutzerordners an.
 	echo 2. Du hast dieses Script einfach so gestartet? Gehe sicher, dass sich das Script unterhalb des Benutzerordners befindet ^("C:\Users\DeinBenutzername\bla"^) oder starte es als Admin.
-	echo 3. Mache nichts - in 60 Sekunden wird die Ausfuehrung automatisch fortgesetzt ...
-	echo Warte 60 Sekunden ...
-	ping -n 60 localhost >NUL
+	REM Only wait here if the user wants this
+	if defined waittime_seconds_continue_on_non_fatal_error if !waittime_seconds_continue_on_non_fatal_error! GTR 0 (
+		echo 3. Mache nichts - in !waittime_seconds_continue_on_non_fatal_error! Sekunden wird die Ausfuehrung automatisch fortgesetzt ...
+		echo Warte !waittime_seconds_continue_on_non_fatal_error! Sekunden ...
+		ping -n !waittime_seconds_continue_on_non_fatal_error! localhost >NUL
+	)
 	REM Without write-access we cannot check for first start so let's always skip the 'welcome screen'
 	SET display_welcome_message_on_first_start=false
 	cls
@@ -98,15 +117,32 @@ if exist !logfile_test_write_access_name! (
 )
 
 REM Check for old logfiles or first start
-if exist %logfile_name% (
-	type %logfile_name%
+if exist !logfile_name! (
+	echo !separator!
+	echo Inhalt des letzten Logs:
+	echo !separator!
+	type !logfile_name!
 ) else (
 	REM First start - display welcome message if wished by user
 	if defined display_welcome_message_on_first_start if "%display_welcome_message_on_first_start%" == "true" (
 		echo Erster Start: Willkommen %logonserver%\%username% - beim NetworkDriveChecker von over_nine_thousand
-		echo In 10 Sekunden geht^'s los
-		ping -n 10 localhost >NUL
+		if defined waittime_seconds_display_welcome_message if !waittime_seconds_display_welcome_message! GTR 0 (
+			echo In !waittime_seconds_display_welcome_message! Sekunden geht^'s weiter
+			REM Skip start waittime if we're already waiting here
+			if defined waittime_seconds_before_start if !waittime_seconds_before_start! GTR 0 (
+				echo !separator!
+				echo Ueberspringe !waittime_seconds_before_start! Sekunden Start-Wartezeit, da die Wartezeit der Willkommensmeldung beim ersten Start gerade laeuft
+				SET /A waittime_seconds_before_start=0
+			)
+			ping -n !waittime_seconds_display_welcome_message! localhost >NUL
+		)
 	)
+)
+
+if defined waittime_seconds_before_start if !waittime_seconds_before_start! GTR 0 (
+	echo !separator!
+	echo Warte !waittime_seconds_before_start! Sekunden vor dem Start um sicherzugehen, dass eine Internetverbindung besteht ^(Beispiel: erste Anmeldung eines Benutzers^) ...
+	ping -n !waittime_seconds_before_start! localhost >NUL
 )
 
 REM Find out how many items are in our array
@@ -117,6 +153,7 @@ if defined domains[%numberof_accounts%] if defined usernames[%numberof_accounts%
 	SET /a numberof_accounts+=1
 	GOTO :ArrayItemCountLoop
 )
+if %numberof_accounts% EQU 0 goto :error_account_array_empty
 
 :find_free_drive_letter
 if not defined driveletter (
@@ -144,7 +181,6 @@ REM TODO: Das springt danach in :login und sorgt damit bei Aenderungen oft für 
 if not defined filename goto :generate_random_filename
 
 :login
-if %numberof_accounts% EQU 0 goto :error_account_array_empty
 
 SET /A position=0
 SET /A user_readable_position=1
@@ -162,7 +198,7 @@ if %position% LSS %numberof_accounts% (
 	REM Clear screen after every loop if we're not in debug mode
 	if defined enable_debug_mode if "!enable_debug_mode!" == "false" cls
 	REM Dateiname ist fuer jeden Durchgang minimal anders
-	call echo Pruefe Account: %user_readable_position% of %numberof_accounts% : %%usernames[%position%]%%
+	call echo Pruefe Account: %user_readable_position% von %numberof_accounts% : %%usernames[%position%]%%
 	
 	REM Use different filename for each run
 	SET filename=!position!_!filename!
@@ -178,7 +214,7 @@ if %position% LSS %numberof_accounts% (
 		SET /a numberof_failed_accounts+=1
 		REM Collect usernames of failed accounts
 		if defined failed_accounts (
-			SET failed_accounts=!failed_accounts!^,
+			SET "failed_accounts=!failed_accounts!^, "
 		)
 		SET failed_accounts=!failed_accounts!!usernames[%position%]!
 		
@@ -186,7 +222,6 @@ if %position% LSS %numberof_accounts% (
 		SET /a user_readable_position+=1
 		GOTO :AccountLoop 
 	)
-	ping -n 10 localhost >NUL
 	REM Datei nur erstellen- und wieder loeschen falls vom Benutzer gewuenscht
 	if defined create_and_delete_dummyfile if "%create_and_delete_dummyfile%" == "true" (
 		if defined enable_debug_mode if "!enable_debug_mode!" == "true" echo Erstelle Datei %filename%
@@ -200,25 +235,27 @@ if %position% LSS %numberof_accounts% (
 	net use %driveletter% /DELETE>nul
 	SET /a position+=1
 	SET /a user_readable_position+=1
+	REM Only wait if user wants it and do not wait if we're processing the last object
+	if defined waittime_seconds_between_successful_account_checks if !waittime_seconds_between_successful_account_checks! GTR 0 if !position! LEQ !position_of_last_element! (
+		echo Warte !waittime_seconds_between_successful_account_checks! Sekunden bis zur Pruefung des naechsten Accounts ...
+		ping -n !waittime_seconds_between_successful_account_checks! localhost >NUL
+	)
 	GOTO :AccountLoop 
 )
 
 
-SET result_text=%numberof_accounts% Accounts geprueft _ Davon erfolgreich: %numberof_successful_accounts% _ Davon fehlgeschlagen: !numberof_failed_accounts!
 REM Delete old logfile
-if exist %logfile_name% del %logfile_name%
+if exist !logfile_name! del !logfile_name!
 REM Write new logfile
-@echo Letzte Ausfuehrung: %date% ^| %result_text% >> %logfile_name%
+@echo Letzte Ausfuehrung: %date% ^| %numberof_accounts% Accounts geprueft ^| Davon erfolgreich: %numberof_successful_accounts% ^| Davon fehlgeschlagen: !numberof_failed_accounts! >> %logfile_name%
 
 REM Display results - clear screen if there were no errors
 if !numberof_failed_accounts! GEQ 1 (
 	REM We have failed accounts --> Show error
-	echo %result_text%
 	goto :error_login_failures
 ) else (
-	REM Everything went well
+	REM Everything went well --> goto nice_ending
 )
-
 goto :nice_ending
 
 
@@ -272,14 +309,13 @@ if exist !logfile_failed_times_name! (
 	REM Delete old logfile as it will get replaced by the new one later
 	DEL !logfile_failed_times_name!
 ) else (
+	REM No logfile with recent value for 'failedtimes' ? Initialize variable only
 	SET /A failedtimes=0
 )
-echo failedtimes ist !failedtimes!
 SET /A failedtimes+=1
-echo failedtimes ist !failedtimes!
 
 SET account_failure_text_1=Es konnten !failedtimes! mal infolge nicht alle Accounts geprueft werden^^!
-SET account_failure_text_2=Die Zugangsdaten folgender Accounts sind eventuell ungueltig: !failed_accounts!
+SET account_failure_text_2=Folgende Accounts konnten nicht geprueft werden: !failed_accounts!
 
 REM Display error dialog if the script failed too many times in a row and the user wants to see this error dialog.
 if !failedtimes! GEQ !max_failures_until_error! if defined display_error_dialog_on_too_many_failures if "!display_error_dialog_on_too_many_failures!" == "true" (
@@ -289,18 +325,21 @@ REM Write new 'number of failures' to log
 @echo !failedtimes! >> !logfile_failed_times_name!
 REM ----------- Handling for too many failures END -----------
 
-REM Do NOT clear screen so that the user can easily track what went wrong
 cls
 color 04
+REM Show complete result
+echo %numberof_accounts% Accounts geprueft ^| Davon erfolgreich: %numberof_successful_accounts% ^| Davon fehlgeschlagen: !numberof_failed_accounts!
 echo Fehler: !account_failure_text_1!
 echo Fehler: !account_failure_text_2!
+echo Hast du gerade keine Internetverbindung?
+echo Blockiert deine Firewall den Zugriff zu !domains[0]! oder einer der anderen Domains sofern du mehrere eingetragen hast?
 echo Hast du vor kurzem dein Passwort geaendert?
 REM In Tests funktionierten selbst korrekt 'escapte' Sonderzeichen nicht. Daher sollte man die Verwendung dieser vermeiden.
 echo Hast du Sonderzeichen im Passwort?
-echo Vermeide Sonderzeichen, vorallem folgende: ^| %% ^^ ^& ^< ^> ^' ^=
+echo Vermeide Sonderzeichen, insbesondere folgende: ^| %% ^^ ^& ^< ^> ^' ^=
 echo Getestete und funktionierende Sonderzeichen: *
-echo Hast du vor kurzem deine Domain ^^(xyz.bitrix24.de^^) geaendert?
-echo Falls Du bitrix24 Accounts verwendest, gehe sicher, dass du dich regelmaessig einloggst, da diese nach 6 Wochen ohne Login geloescht werden^^!
+echo Hast du vor kuerzlich eine deiner Domains ^(z.B. !domains[0]!^) geaendert?
+echo Falls Du bitrix24 Accounts verwendest, gehe sicher, dass du dich ^(mit diesem Script^) regelmaessig einloggst, da diese nach 6 Wochen ohne Login geloescht werden^^!^^!
 goto :bad_ending
 
 :error_windows_xp_unsupported
@@ -317,8 +356,13 @@ goto :bad_ending
 
 
 :bad_ending
-echo Druecke ENTER zum Beenden
-pause>nul
+if defined waittime_seconds_on_bad_ending if !waittime_seconds_on_bad_ending! GTR 0 (
+	echo Dieses Fenster wird in !waittime_seconds_on_bad_ending! Sekunden geschlossen
+	ping -n !waittime_seconds_on_bad_ending! localhost >NUL
+) else (
+	echo Druecke ENTER zum Beenden
+	pause>nul
+)
 exit
 
 
@@ -330,7 +374,9 @@ if exist !logfile_failed_times_name! (
 	del !logfile_failed_times_name!
 )
 cls
-echo ALLE %numberof_accounts% Account^(s^) wurden erfolgreich geprueft :^)
-echo Das Fenster wird in 10 Sekunden geschlossen
-ping -n 10 localhost >NUL
+echo ALLE !numberof_accounts! Account^(s^) wurden erfolgreich geprueft :^)
+if defined waittime_seconds_on_successful_ending if !waittime_seconds_on_successful_ending! GTR 0 (
+	echo Dieses Fenster wird in !waittime_seconds_on_successful_ending! Sekunden geschlossen
+	ping -n !waittime_seconds_on_successful_ending! localhost >NUL
+)
 exit
