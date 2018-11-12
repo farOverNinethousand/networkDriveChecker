@@ -37,7 +37,7 @@ Sollte es wiederholt zu Problemen bei der Ausführung kommen, wird eine Fehlerme
 1. Allgemeine Einstellungen
 * Immer einen bestimmten Laufwerksbuchstaben erzwingen: SET driveletter=Z:
 * Name der Testdatei selbst festlegen: SET filename=testname.txt
-* Festlegen, ob nach erfolgreichem Login eine Testdatei erstellt und wieder gelöscht werden soll (zur Erhaltung von Bitrix24 Accounts irrelevant): SET create_and_delete_dummyfile=true|false
+* Festlegen, ob nach erfolgreichem Login eine Testdatei erstellt und wieder gelöscht werden soll: SET create_and_delete_dummyfile=true|false
 * SET display_welcome_message_on_first_start=true|false --> 'Willkommen' Text bei der ersten Ausführung des Scripts zeigen/nicht zeigen
 
 2. Einstellungen zu Logging und Fehlermeldungen
@@ -70,11 +70,11 @@ Sorry, dafür gibt es noch keine Lösung (in diesem Repository).
 ## Warum wurde dieses Script ursprünglich geschrieben?
 Um automatisiert die Accounts des Anbieters bitrix24.de aktiv zu halten und wegen eines Deals auf MyDealz durch den man sich dort 100GB Cloud Speicher permanent holen konnte: https://www.mydealz.de/deals/100gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-1232057
 
-Bitrix24 löscht Accounts, sofern man sich nicht alle 6 Wochen mindestens einmal einloggt.
+Bitrix24 löscht Accounts, sofern man sich nicht alle 6 Wochen mindestens einmal einloggt (man muss dafür keine Datei(en) hochladen).
 Man erhält nach 4 Wochen (hier 33 Tage) die erste Warnung ("Ihr Account wird in 14 Tagen gelöscht") und nach 5 Wochen die zweite und eventuell letzte Warnung ("Ihr Account wird in 7 Tagen gelöscht").
 
 ## Wie oft sollte man das Script ausführen, damit Bitrix24 Accounts sicher nicht gelöscht werden?
-Jede woche einmal.
+Mindestens jede woche einmal.
 
 ## Troubleshooting für Windows XP Benutzer
 Windows XP hat leider keine https Unterstützung für WebDAV daher wird man beim Start dieses Scripts idR eine 'Systemfehler 67' oder auch 'Systemfehler 5' Fehlermeldung bekommen.
