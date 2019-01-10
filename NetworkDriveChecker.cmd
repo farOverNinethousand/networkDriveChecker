@@ -2,7 +2,7 @@
 REM Main purpose: Keep Bitrix24.de Accounts alive: https://www.mydealz.de/deals/100gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-1232057
 
 :start
-title NetworkDriveChecker v.1.10 by over_nine_thousand - MyDealz
+title NetworkDriveChecker v.1.11 by over_nine_thousand - MyDealz
 
 REM recommended according to: http://steve-jansen.github.io/guides/windows-batch-scripting/part-2-variables.html
 SETLOCAL ENABLEEXTENSIONS
@@ -128,13 +128,15 @@ if exist !logfile_name! (
 		echo Erster Start: Willkommen %logonserver%\%username% - beim NetworkDriveChecker von over_nine_thousand
 		if defined waittime_seconds_display_welcome_message if !waittime_seconds_display_welcome_message! GTR 0 (
 			echo In !waittime_seconds_display_welcome_message! Sekunden geht^'s weiter
+			ping -n !waittime_seconds_display_welcome_message! localhost >NUL
 			REM Skip start waittime if we're already waiting here
 			if defined waittime_seconds_before_start if !waittime_seconds_before_start! GTR 0 (
-				echo !separator!
-				echo Ueberspringe !waittime_seconds_before_start! Sekunden Start-Wartezeit, da die Wartezeit der Willkommensmeldung beim ersten Start gerade laeuft
+				if defined enable_debug_mode if "!enable_debug_mode!" == "true" (
+					echo !separator!
+					echo Ueberspringe !waittime_seconds_before_start! Sekunden Start-Wartezeit, da die Wartezeit der Willkommensmeldung beim ersten Start gerade laeuft
+				)
 				SET /A waittime_seconds_before_start=0
 			)
-			ping -n !waittime_seconds_display_welcome_message! localhost >NUL
 		)
 	)
 )
@@ -334,7 +336,8 @@ echo Fehler: !account_failure_text_2!
 echo Hast du gerade keine Internetverbindung?
 echo Blockiert deine Firewall den Zugriff zu !domains[0]! oder einer der anderen Domains sofern du mehrere eingetragen hast?
 echo Hast du vor kurzem dein Passwort geaendert?
-REM In Tests funktionierten selbst korrekt 'escapte' Sonderzeichen nicht. Daher sollte man die Verwendung dieser vermeiden.
+echo Hast du dieses Script direkt nach dem Start deines Betriebssystems gestartet? Dann muss es vor der Ausfuehrung vielleicht laenger warten bis die Netzwerkverbindungen des Betriebssystems bereit sind - erhoehe den folgenden Wert im Script: waittime_seconds_before_start
+REM In Tests funktionierten selbst korrekt maskierte Sonderzeichen nicht. Daher sollte man die Verwendung dieser vermeiden.
 echo Hast du Sonderzeichen im Passwort?
 echo Vermeide Sonderzeichen, insbesondere folgende: ^| %% ^^ ^& ^< ^> ^' ^=
 echo Getestete und funktionierende Sonderzeichen: *
