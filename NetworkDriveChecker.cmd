@@ -2,73 +2,13 @@
 REM Main purpose: Keep Bitrix24.de Accounts alive: https://www.mydealz.de/deals/100gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-1232057
 
 :start
-title NetworkDriveChecker v.1.30 by over_nine_thousand - MyDealz
-
-REM recommended according to: http://steve-jansen.github.io/guides/windows-batch-scripting/part-2-variables.html
-SETLOCAL ENABLEEXTENSIONS
-REM Important for function which generates the random filename: https://ss64.com/nt/delayedexpansion.html
-SETLOCAL enableDelayedExpansion
-SET me=%~n0
-SET parent=%~dp0
-REM Newline, THX: https://stackoverflow.com/questions/132799/how-can-you-echo-a-newline-in-batch-files
-REM (set \NL=^
-REM %=Do not remove this line=%
-REM )
-REM Usage: Newline!\NL!Here
-
-color 0a
+title NetworkDriveChecker v.1.33 by over_nine_thousand - MyDealz
 
 REM ----------------------------------------------- Einstellungen START -----------------------------------------------
-REM 'protocol' und 'domain' nur aendern, falls Accounts einer komplett anderen Webseite geprueft werden sollen!
-SET protocol=https://
-SET domain=bitrix24.de
-REM Das ist der Standard-Pfad, den alle neuen bitrix24 Accounts haben. Sofern man die Standard-Ordner loescht, muss man diesen hier anpassen! Achtung, dieser Pfad muss unter allen eingetragenen Accounts existieren!
-SET "relative_webdav_path=/company/personal/user/1/disk/path/Offene sichtbare Gruppe/"
-REM Hier festen Laufwerksbuchstaben setzen falls dieser nicht automatisch gewaehlt werden soll (Beispiel: SET driveletter=A: - den Doppelpunkt am Ende nicht vergessen!)
-SET driveletter=
-
-REM Name der Testdatei hier festlegen, ansonsten wird ein zufaelliger Name generiert (Beispiel: SET filename=testdatei.txt)
-SET filename=
-REM Mit folgendem String werden Ausgaben manchmal voneinander getrennt
-SET separator=-------------------------------------------------------
-
-REM Dateinamen saemtlicher vom Script eventuell zu erstellenden Dateien
-REM Dateiname des Logs
-SET logfile_name=NetworkDriveCheckerLog.txt
-REM Dateiname des Logs fuer die Anzahl fehlgeschlagener Ausfuehrungen
-SET logfile_failed_times_name=NetworkDriveCheckerLogFailedTimes.txt
-REM Dateiname zum Testen des Schreibzugriffs
-SET logfile_test_write_access_name=NetworkDriveCheckerTestWriteAccess.txt
-
-REM Falls gewuenscht wird eine Dummy Datei erstellt und geloescht, falls nicht (=false) wird nur das Netzlaufwerk erstellt und wieder geloescht
-SET create_and_delete_dummyfile=true
-REM Soll beim ersten Start ein 'Willkommen' Text angezeigt werden?
-SET display_welcome_message_on_first_start=true
-REM Das aktivieren falls man genauere (Fehler-)Ausgaben moechte ausserdem werden die Ausgaben nicht nach jedem Account (Durchgang) geloescht. Die 'Willkommens-Wartezeit' wird ebenfalls deaktiviert.
-SET enable_debug_mode=false
-
-REM Fehlerdialog wird gezeigt sobald das Script mehr als x-mal fehlschlaegt.
-SET /A max_failures_until_error=3
-REM Zeige FehlerDialog falls das Script >= max_failures_until_error fehlschlaegt
-SET display_error_dialog_on_too_many_failures=true
-REM Zeige unter Windows XP keine Fehlermeldung nach dem Start sondern versuche es trotzdem (wird idR nicht funktionieren)
-SET force_allow_windows_xp=false
-
-REM Wartezeiten
-REM Wartezeit vor dem Start (nuetzlich bei der Ausfuehrung direkt nach Benutzeranmeldung, da es einige Sekunden dauern kann, bis eine Internetverbindung verfuegbar ist)
-SET /A waittime_seconds_before_start=8
-REM Wartezeit fuer die "Willkommen" Meldung beim ersten Start des Scripts
-SET /A waittime_seconds_display_welcome_message=10
-REM Wartezeit bei Fehlern nach denen das Script weiter ausgefuehrt wird ("Nicht-fatale-Fehler")
-SET /A waittime_seconds_continue_on_non_fatal_error=60
-REM Wartezeit nach der das Fenster bei erfolgreicher Ausfuehrung geschlossen wird
-SET /A waittime_seconds_on_successful_ending=10
-REM Wartezeit nach der das Fenster bei fehlerhafter Ausfuehrung geschlossen wird
-SET /A waittime_seconds_on_bad_ending=180
-REM Wartezeit nach jeder ERFOLGREICHEN Account-Pruefung (ansonsten geht es sofort mit dem nächsten Account weiter)
-SET /A waittime_seconds_between_successful_account_checks=5
-
 REM -------------- Zugangsdaten hier eintragen --------------
+REM Fuer jeden Account muessen eine subdomain, ein username(E-Mail) und Passwort eingetragen werden!
+REM Es sind VIER Beispiel-Eintraege vorhanden.
+REM Traegt man z.B. nur einen Account ein, muessen jeweils die anderen (DREI) Beispiel-Eintraege geloescht werden!
 SET "subdomains[0]=test1-bla"
 SET "subdomains[1]=test2-bla"
 SET "subdomains[2]=test3-bla"
@@ -84,7 +24,67 @@ SET "passwords[1]=password2"
 SET "passwords[2]=password3"
 SET "passwords[3]=password4"
 
+REM Einstellungen basics - diese muessen trotzdem meist nicht angepasst werden!!
+REM 'protocol' und 'domain' nur aendern, falls Accounts einer komplett anderen Webseite geprueft werden sollen!
+SET protocol=https://
+SET domain=bitrix24.de
+REM Das ist der Standard-Pfad, den alle neuen bitrix24 Accounts haben. Sofern man die Standard-Ordner loescht, muss man diesen Wert hier anpassen! Achtung! Dieser Pfad muss unter allen eingetragenen Accounts existieren!
+SET "relative_webdav_path=/company/personal/user/1/disk/path/Offene sichtbare Gruppe/"
+REM Hier festen Laufwerksbuchstaben setzen falls dieser nicht automatisch gewaehlt werden soll (Beispiel: SET driveletter=A: - den Doppelpunkt am Ende nicht vergessen!)
+SET driveletter=
+
+REM Einstellungen fuer Dateinamen von Logs und temporaeren Dateien
+REM Dateiname des Logs
+SET logfile_name=NetworkDriveCheckerLog.txt
+REM Dateiname des Logs fuer die Anzahl fehlgeschlagener Ausfuehrungen
+SET logfile_failed_times_name=NetworkDriveCheckerLogFailedTimes.txt
+REM Dateiname zum Testen des Schreibzugriffs
+SET logfile_test_write_access_name=NetworkDriveCheckerTestWriteAccess.txt
+REM Name der Testdatei hier festlegen, ansonsten wird ein zufaelliger Name generiert (Beispiel: SET filename=testdatei.txt)
+SET filename=
+
+REM Falls gewuenscht wird eine Dummy Datei erstellt und geloescht, falls nicht (=false) wird nur das Netzlaufwerk erstellt und wieder geloescht
+SET create_and_delete_dummyfile=true
+REM Soll beim ersten Start ein 'Willkommen' Text angezeigt werden?
+SET display_welcome_message_on_first_start=true
+REM Das aktivieren falls man genauere (Fehler-)Ausgaben moechte ausserdem werden die Ausgaben nicht nach jedem Account (Durchgang) geloescht. Diese Einstellung deaktiviert ebenfalls diverse Wartezeiten!
+SET enable_debug_mode=false
+
+REM Einstellungen fuer Fehlerdialoge
+REM Fehlerdialog wird gezeigt sobald das Script mehr als x-mal fehlschlaegt.
+SET /A max_failures_until_error=3
+REM Zeige FehlerDialog falls das Script >= max_failures_until_error fehlschlaegt
+SET display_error_dialog_on_too_many_failures=true
+
+REM Wartezeiten fuer Einstellungen
+REM Wartezeit vor dem Start (nuetzlich bei der Ausfuehrung direkt nach Benutzeranmeldung, da es einige Sekunden dauern kann, bis Netzwerkverbindungen verfuegbar sind)
+SET /A waittime_seconds_before_start=8
+REM Wartezeit fuer die "Willkommen" Meldung beim ersten Start des Scripts
+SET /A waittime_seconds_display_welcome_message=10
+REM Wartezeit bei Fehlern nach denen das Script weiter ausgefuehrt wird ("Nicht-fatale-Fehler")
+SET /A waittime_seconds_continue_on_non_fatal_error=60
+REM Wartezeit nach der das Fenster bei erfolgreicher Ausfuehrung geschlossen wird
+SET /A waittime_seconds_on_successful_ending=10
+REM Wartezeit nach der das Fenster bei fehlerhafter Ausfuehrung geschlossen wird
+SET /A waittime_seconds_on_bad_ending=180
+REM Wartezeit nach jeder ERFOLGREICHEN Account-Pruefung (ansonsten geht es sofort mit dem nächsten Account weiter)
+SET /A waittime_seconds_between_successful_account_checks=5
+
+REM Einstellungen special
+REM Zeige unter Windows XP keine Fehlermeldung nach dem Start sondern versuche es trotzdem (wird idR nicht funktionieren)
+SET force_allow_windows_xp=false
+REM Mit folgendem String werden Ausgaben manchmal voneinander getrennt
+SET separator=-------------------------------------------------------
 REM ----------------------------------------------- Einstellungen ENDE -----------------------------------------------
+
+REM recommended according to: http://steve-jansen.github.io/guides/windows-batch-scripting/part-2-variables.html
+SETLOCAL ENABLEEXTENSIONS
+REM Important for function which generates the random filename and our 'Array': https://ss64.com/nt/delayedexpansion.html
+SETLOCAL enableDelayedExpansion
+SET me=%~n0
+SET parent=%~dp0
+
+color 0a
 
 REM Check for unsupported OS
 REM thx: https://stackoverflow.com/questions/13212033/get-windows-version-in-a-batch-file (although this script does not find my windows 7 correctly but here we only want to identify XP)
@@ -256,8 +256,12 @@ if %position% LSS %numberof_accounts% (
 	SET /a user_readable_position+=1
 	REM Only wait if user wants it and do not wait if we're processing the last object
 	if defined waittime_seconds_between_successful_account_checks if !waittime_seconds_between_successful_account_checks! GTR 0 if !position! LEQ !position_of_last_element! (
-		echo Warte !waittime_seconds_between_successful_account_checks! Sekunden bis zur Pruefung des naechsten Accounts ...
-		ping -n !waittime_seconds_between_successful_account_checks! localhost >NUL
+		if defined enable_debug_mode if "!enable_debug_mode!" == "true" (
+			echo Ueberspringe Wartezeit zwischen AccountPruefungen, da der Debug-Modus aktiv ist
+		) else (
+			echo ERFOLGREICH ^| Warte !waittime_seconds_between_successful_account_checks! Sekunden bis zur Pruefung des naechsten Accounts ...
+			ping -n !waittime_seconds_between_successful_account_checks! localhost >NUL
+		)
 	)
 	GOTO :AccountLoop 
 )
@@ -360,7 +364,7 @@ echo Hast du Sonderzeichen im Passwort?
 echo Vermeide Sonderzeichen, insbesondere folgende: Leerzeichen und folgende Zeichen: ^| %% ^^ ^& ^< ^> ^' ^=
 echo Getestete und funktionierende Sonderzeichen: *
 echo Hast du vor kuerzlich eine deiner Domains ^(z.B. !subdomains[0]!^) geaendert?
-echo Hast du die Standard-Ordnerstruktur auf bitrix24 geloescht? Dann musst du auch 'relative_webdav_path' im Script anpassen^^!^^!
+echo Hast du die Standard-Ordnerstruktur von bitrix24 geloescht? Dann musst du auch 'relative_webdav_path' im Script anpassen^^!^^!
 echo Pruefe, ob du das Netzlaufwerk manuell hinzufuegen kannst: https://helpdesk.bitrix24.de/open/8546673/
 goto :bad_ending
 
@@ -378,6 +382,7 @@ goto :bad_ending
 
 
 :bad_ending
+REM One or more errors occured
 if defined waittime_seconds_on_bad_ending if !waittime_seconds_on_bad_ending! GTR 0 (
 	echo Dieses Fenster wird in !waittime_seconds_on_bad_ending! Sekunden geschlossen
 	ping -n !waittime_seconds_on_bad_ending! localhost >NUL
@@ -391,12 +396,20 @@ exit
 
 :nice_ending
 REM Everything went well :)
-REM Cleanup: Delete file which contains number of failed times as we only want this to trigger an errormessage if it fails several times in a row
+REM Cleanup: Delete file which contains number of failed times as we only want this to trigger an errormessage if this script ends with errors several times in a row
 if exist !logfile_failed_times_name! (
+	if defined enable_debug_mode if "!enable_debug_mode!" == "true" (
+		echo Im letzten Durchgang passierten Fehler, aber in diesem nicht - loesche Fehler-Zaehler-Datei !logfile_failed_times_name!
+	)
 	del !logfile_failed_times_name!
 )
-cls
-echo ALLE !numberof_accounts! Account^(s^) wurden erfolgreich geprueft :^)
+if defined enable_debug_mode if "!enable_debug_mode!" == "true" (
+	REM Kein cls ausfuehren, da wir im debug-Modus sind
+	echo Ueberspringe clearscreen, da der Debug-Modus aktiv ist
+) else (
+	cls
+)
+echo ERFOLG ^| ALLE !numberof_accounts! Account^(s^) wurden erfolgreich geprueft :^)
 if defined waittime_seconds_on_successful_ending if !waittime_seconds_on_successful_ending! GTR 0 (
 	echo Dieses Fenster wird in !waittime_seconds_on_successful_ending! Sekunden geschlossen
 	ping -n !waittime_seconds_on_successful_ending! localhost >NUL

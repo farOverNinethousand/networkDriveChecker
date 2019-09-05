@@ -16,6 +16,11 @@ Infos zu einer möglichen Linux Version finden sich weiter unten in diesem Dokum
 
 2. Trage deine (bitrix24.de) Zugangsdaten in das Script (NetworkDriveChecker.cmd) ein:
 Ganz oben im Script unter 'subdomains', 'usernames' und 'passwords'.
+Jeder Account hat quasi drei Zugangsdaten. Benutzername(bzw. Email) und Passwort solltest du kennen.
+Die dazugehörige Domain siehst du in der Adresszeile deines Browsers, wenn du dich über diesen einloggst und im Menü Links auf "Bitrix24.drive" klickst:
+
+https://HIER_STEHT_DEINE_SUB_DOMAIN.bitrix24.de/company/personal/user/1/disk/path/
+
 Wichtig: Lösche die restlichen Dummy-Einträge falls du z.B. nur einen Account hast (in dem Fall die Zeilen 'SET subdomains[1]=test2-bla' usw. löschen.)
 Außerdem wichtig: Vermeide Sonderzeichen im Passwort - es gibt nur wenige, die erlaubt sind.
 
