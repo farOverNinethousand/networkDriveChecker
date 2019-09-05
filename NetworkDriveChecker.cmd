@@ -2,7 +2,7 @@
 REM Main purpose: Keep Bitrix24.de Accounts alive: https://www.mydealz.de/deals/100gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-1232057
 
 :start
-title NetworkDriveChecker v.1.11 by over_nine_thousand - MyDealz
+title NetworkDriveChecker v.1.30 by over_nine_thousand - MyDealz
 
 REM recommended according to: http://steve-jansen.github.io/guides/windows-batch-scripting/part-2-variables.html
 SETLOCAL ENABLEEXTENSIONS
@@ -19,7 +19,12 @@ REM Usage: Newline!\NL!Here
 color 0a
 
 REM ----------------------------------------------- Einstellungen START -----------------------------------------------
-REM Hier festen Laufwerksbuchstaben setzen falls dieser nicht automatisch gewaehlt werden soll (Beispiel: SET driveletter=A:)
+REM 'protocol' und 'domain' nur aendern, falls Accounts einer komplett anderen Webseite geprueft werden sollen!
+SET protocol=https://
+SET domain=bitrix24.de
+REM Das ist der Standard-Pfad, den alle neuen bitrix24 Accounts haben. Sofern man die Standard-Ordner loescht, muss man diesen hier anpassen! Achtung, dieser Pfad muss unter allen eingetragenen Accounts existieren!
+SET "relative_webdav_path=/company/personal/user/1/disk/path/Offene sichtbare Gruppe/"
+REM Hier festen Laufwerksbuchstaben setzen falls dieser nicht automatisch gewaehlt werden soll (Beispiel: SET driveletter=A: - den Doppelpunkt am Ende nicht vergessen!)
 SET driveletter=
 
 REM Name der Testdatei hier festlegen, ansonsten wird ein zufaelliger Name generiert (Beispiel: SET filename=testdatei.txt)
@@ -39,7 +44,7 @@ REM Falls gewuenscht wird eine Dummy Datei erstellt und geloescht, falls nicht (
 SET create_and_delete_dummyfile=true
 REM Soll beim ersten Start ein 'Willkommen' Text angezeigt werden?
 SET display_welcome_message_on_first_start=true
-REM Das aktivieren falls man genauere (Fehler-)Ausgaben moechte ausserdem werden die Ausgaben dann nicht nach jedem Account (Durchgang) geloescht
+REM Das aktivieren falls man genauere (Fehler-)Ausgaben moechte ausserdem werden die Ausgaben nicht nach jedem Account (Durchgang) geloescht. Die 'Willkommens-Wartezeit' wird ebenfalls deaktiviert.
 SET enable_debug_mode=false
 
 REM Fehlerdialog wird gezeigt sobald das Script mehr als x-mal fehlschlaegt.
@@ -59,15 +64,15 @@ SET /A waittime_seconds_continue_on_non_fatal_error=60
 REM Wartezeit nach der das Fenster bei erfolgreicher Ausfuehrung geschlossen wird
 SET /A waittime_seconds_on_successful_ending=10
 REM Wartezeit nach der das Fenster bei fehlerhafter Ausfuehrung geschlossen wird
-SET /A waittime_seconds_on_bad_ending=120
+SET /A waittime_seconds_on_bad_ending=180
 REM Wartezeit nach jeder ERFOLGREICHEN Account-Pruefung (ansonsten geht es sofort mit dem nächsten Account weiter)
 SET /A waittime_seconds_between_successful_account_checks=5
 
-REM Zugangsdaten hier eintragen
-SET "domains[0]=test1.bitrix24.de"
-SET "domains[1]=test2.bitrix24.de"
-SET "domains[2]=test3.bitrix24.de"
-SET "domains[3]=test4.bitrix24.de"
+REM -------------- Zugangsdaten hier eintragen --------------
+SET "subdomains[0]=test1-bla"
+SET "subdomains[1]=test2-bla"
+SET "subdomains[2]=test3-bla"
+SET "subdomains[3]=test4-bla"
 
 SET "usernames[0]=user1"
 SET "usernames[1]=user2"
@@ -78,6 +83,7 @@ SET "passwords[0]=password1"
 SET "passwords[1]=password2"
 SET "passwords[2]=password3"
 SET "passwords[3]=password4"
+
 REM ----------------------------------------------- Einstellungen ENDE -----------------------------------------------
 
 REM Check for unsupported OS
@@ -127,13 +133,18 @@ if exist !logfile_name! (
 	if defined display_welcome_message_on_first_start if "%display_welcome_message_on_first_start%" == "true" (
 		echo Erster Start: Willkommen %logonserver%\%username% - beim NetworkDriveChecker von over_nine_thousand
 		if defined waittime_seconds_display_welcome_message if !waittime_seconds_display_welcome_message! GTR 0 (
-			echo In !waittime_seconds_display_welcome_message! Sekunden geht^'s weiter
-			ping -n !waittime_seconds_display_welcome_message! localhost >NUL
+			if defined enable_debug_mode if "!enable_debug_mode!" == "true" (
+				echo Ueberspringe 'waittime_seconds_display_welcome_message', da der Debug-Modus aktiv ist
+			) else (
+				echo In !waittime_seconds_display_welcome_message! Sekunden geht^'s weiter
+				ping -n !waittime_seconds_display_welcome_message! localhost >NUL
+			)
 			REM Skip start waittime if we're already waiting here
 			if defined waittime_seconds_before_start if !waittime_seconds_before_start! GTR 0 (
+				echo Ueberspringe !waittime_seconds_before_start! Sekunden 'waittime_seconds_before_start' Start-Wartezeit, da dies der erste Start ist und es fuer diesen bereits eine extra-Wartezeit gibt
 				if defined enable_debug_mode if "!enable_debug_mode!" == "true" (
 					echo !separator!
-					echo Ueberspringe !waittime_seconds_before_start! Sekunden Start-Wartezeit, da die Wartezeit der Willkommensmeldung beim ersten Start gerade laeuft
+					echo Ueberspringe !waittime_seconds_before_start! Sekunden 'waittime_seconds_before_start' Start-Wartezeit, da der Debug-Modus aktiv ist
 				)
 				SET /A waittime_seconds_before_start=0
 			)
@@ -143,15 +154,19 @@ if exist !logfile_name! (
 
 if defined waittime_seconds_before_start if !waittime_seconds_before_start! GTR 0 (
 	echo !separator!
-	echo Warte !waittime_seconds_before_start! Sekunden vor dem Start um sicherzugehen, dass eine Internetverbindung besteht ^(Beispiel: erste Anmeldung eines Benutzers^) ...
-	ping -n !waittime_seconds_before_start! localhost >NUL
+	if defined enable_debug_mode if "!enable_debug_mode!" == "true" (
+		echo Ueberspringe 'waittime_seconds_before_start', weil der Debug-Modus aktiv ist
+	) else (
+		echo Warte !waittime_seconds_before_start! Sekunden vor dem Start um sicherzugehen, dass eine Internetverbindung besteht ^(Beispiel: Erste Anmeldung eines Benutzers nach dem Systemstart^) ...
+		ping -n !waittime_seconds_before_start! localhost >NUL
+	)
 )
 
 REM Find out how many items are in our array
 SET /A numberof_accounts=0
 :ArrayItemCountLoop
 
-if defined domains[%numberof_accounts%] if defined usernames[%numberof_accounts%] if defined passwords[%numberof_accounts%] (
+if defined subdomains[%numberof_accounts%] if defined usernames[%numberof_accounts%] if defined passwords[%numberof_accounts%] (
 	SET /a numberof_accounts+=1
 	GOTO :ArrayItemCountLoop
 )
@@ -196,16 +211,18 @@ SET failed_accounts=
 
 REM Important for the loop to work correctly!
 setlocal enableDelayedExpansion
+
 if %position% LSS %numberof_accounts% (
 	REM Clear screen after every loop if we're not in debug mode
 	if defined enable_debug_mode if "!enable_debug_mode!" == "false" cls
 	REM Dateiname ist fuer jeden Durchgang minimal anders
-	call echo Pruefe Account: %user_readable_position% von %numberof_accounts% : %%usernames[%position%]%%
+	call echo Pruefe Account: !user_readable_position! von !numberof_accounts! : !usernames[%position%]!
 	
 	REM Use different filename for each run
 	SET filename=!position!_!filename!
-	if defined enable_debug_mode if "!enable_debug_mode!" == "true" echo Erstelle Laufwerk %driveletter%
-	net use %driveletter% "https://!domains[%position%]!/company/personal/user/1/disk/path/Offene sichtbare Gruppe/" /persistent:yes /user:!usernames[%position%]! !passwords[%position%]!>nul && (
+	SET full_webdav_path=!protocol!!subdomains[%position%]!.!domain!!relative_webdav_path!
+	if defined enable_debug_mode if "!enable_debug_mode!" == "true" echo Erstelle Laufwerk !driveletter! zu Pfad: !full_webdav_path!
+	net use !driveletter! "!full_webdav_path!" /persistent:yes /user:!usernames[%position%]! !passwords[%position%]!>nul && (
 		REM Login was successful
 		REM Increase counter of failed accounts
 		SET /a numberof_successful_accounts+=1
@@ -234,7 +251,7 @@ if %position% LSS %numberof_accounts% (
 		if defined enable_debug_mode if "!enable_debug_mode!" == "true" echo Erstelle KEINE Datei
 	)
 	if defined enable_debug_mode if "!enable_debug_mode!" == "true" echo Trenne Laufwerk %driveletter%
-	net use %driveletter% /DELETE>nul
+	net use !driveletter! /DELETE>nul
 	SET /a position+=1
 	SET /a user_readable_position+=1
 	REM Only wait if user wants it and do not wait if we're processing the last object
@@ -316,33 +333,35 @@ if exist !logfile_failed_times_name! (
 )
 SET /A failedtimes+=1
 
-SET account_failure_text_1=Es konnten !failedtimes! mal infolge nicht alle Accounts geprueft werden^^!
-SET account_failure_text_2=Folgende Accounts konnten nicht geprueft werden: !failed_accounts!
+SET "account_failure_text_1=Es konnten !failedtimes! Mal infolge nicht alle Accounts geprueft werden."
+SET "account_failure_text_2=Problematische Accounts: !failed_accounts!"
 
 REM Display error dialog if the script failed too many times in a row and the user wants to see this error dialog.
 if !failedtimes! GEQ !max_failures_until_error! if defined display_error_dialog_on_too_many_failures if "!display_error_dialog_on_too_many_failures!" == "true" (
-	msg "%username%" NetworkDriveChecker: !account_failure_text_1! !account_failure_text_2!
+	msg !username! NetworkDriveChecker: !account_failure_text_1! !account_failure_text_2!
 )
 REM Write new 'number of failures' to log
 @echo !failedtimes! >> !logfile_failed_times_name!
 REM ----------- Handling for too many failures END -----------
 
-cls
+if defined enable_debug_mode if "!enable_debug_mode!" == "false" cls
 color 04
 REM Show complete result
 echo %numberof_accounts% Accounts geprueft ^| Davon erfolgreich: %numberof_successful_accounts% ^| Davon fehlgeschlagen: !numberof_failed_accounts!
 echo Fehler: !account_failure_text_1!
-echo Fehler: !account_failure_text_2!
+echo !account_failure_text_2!
+echo Moegliche Fehlerursachen:
 echo Hast du gerade keine Internetverbindung?
-echo Blockiert deine Firewall den Zugriff zu !domains[0]! oder einer der anderen Domains sofern du mehrere eingetragen hast?
-echo Hast du vor kurzem dein Passwort geaendert?
-echo Hast du dieses Script direkt nach dem Start deines Betriebssystems gestartet? Dann muss es vor der Ausfuehrung vielleicht laenger warten bis die Netzwerkverbindungen des Betriebssystems bereit sind - erhoehe den folgenden Wert im Script: waittime_seconds_before_start
+echo Blockiert deine Firewall den Zugriff zu !subdomains[0]!.!domain! oder einer der anderen ^^(Sub-^^)Domains sofern du mehrere eingetragen hast?
+echo Hast du dieses Script direkt nach dem Start deines Betriebssystems gestartet? Dann muss es vor der Ausfuehrung vielleicht laenger warten bis die Netzwerkverbindungen hergestellt sind - erhoehe den folgenden Wert im Script: waittime_seconds_before_start
 REM In Tests funktionierten selbst korrekt maskierte Sonderzeichen nicht. Daher sollte man die Verwendung dieser vermeiden.
+echo Hast du vor kurzem dein Passwort geaendert und vergessen, es in diesem Script anzupassen?
 echo Hast du Sonderzeichen im Passwort?
-echo Vermeide Sonderzeichen, insbesondere folgende: ^| %% ^^ ^& ^< ^> ^' ^=
+echo Vermeide Sonderzeichen, insbesondere folgende: Leerzeichen und folgende Zeichen: ^| %% ^^ ^& ^< ^> ^' ^=
 echo Getestete und funktionierende Sonderzeichen: *
-echo Hast du vor kuerzlich eine deiner Domains ^(z.B. !domains[0]!^) geaendert?
-echo Falls Du bitrix24 Accounts verwendest, gehe sicher, dass du dich ^(mit diesem Script^) regelmaessig einloggst, da diese nach 6 Wochen ohne Login geloescht werden^^!^^!
+echo Hast du vor kuerzlich eine deiner Domains ^(z.B. !subdomains[0]!^) geaendert?
+echo Hast du die Standard-Ordnerstruktur auf bitrix24 geloescht? Dann musst du auch 'relative_webdav_path' im Script anpassen^^!^^!
+echo Pruefe, ob du das Netzlaufwerk manuell hinzufuegen kannst: https://helpdesk.bitrix24.de/open/8546673/
 goto :bad_ending
 
 :error_windows_xp_unsupported
