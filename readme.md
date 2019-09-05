@@ -19,10 +19,13 @@ Ganz oben im Script unter 'subdomains', 'usernames' und 'passwords'.
 Jeder Account hat quasi drei Zugangsdaten. Benutzername(bzw. Email) und Passwort solltest du kennen.
 Die dazugehörige Domain siehst du in der Adresszeile deines Browsers, wenn du dich über diesen einloggst und im Menü Links auf "Bitrix24.drive" klickst:
 
-https://HIER_STEHT_DEINE_SUB_DOMAIN.bitrix24.de/company/personal/user/1/disk/path/
+`https://HIER_STEHT_DEINE_SUB_DOMAIN.bitrix24.de/company/personal/user/1/disk/path/`
 
 Wichtig: Lösche die restlichen Dummy-Einträge falls du z.B. nur einen Account hast (in dem Fall die Zeilen 'SET subdomains[1]=test2-bla' usw. löschen.)
 Außerdem wichtig: Vermeide Sonderzeichen im Passwort - es gibt nur wenige, die erlaubt sind.
+
+Veranschaulichung:
+![alt text](https://raw.githubusercontent.com/farOverNinethousand/networkDriveChecker/master/Screenshots/2019_09_06_Beispiel_Accounts_eintragen.png "Veranschaulichung Zugangsdaten in Script eintragen")
 
 3. Starte die "NetworkDriveChecker.cmd" einmal testweise per Doppelklick.
 Solltest du Fehlermeldungen bekommen, schaue weiter unten in dieser Readme.
