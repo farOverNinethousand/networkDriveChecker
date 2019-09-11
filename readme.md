@@ -28,8 +28,8 @@ Mehr Infos zur Verwendung von Sonderzeichen siehe weiter unten.
 Veranschaulichung:
 ![alt text](https://raw.githubusercontent.com/farOverNinethousand/networkDriveChecker/master/Screenshots/2019_09_06_Beispiel_Accounts_eintragen.png "Veranschaulichung Zugangsdaten in Script eintragen")
 
-3. Starte die "NetworkDriveChecker.cmd" einmal testweise per Doppelklick.
-Solltest du Fehlermeldungen bekommen, schaue weiter unten in dieser Readme.
+3. Starte die "NetworkDriveChecker.cmd" einmal testweise per Doppelklick und gehe sicher, dass es ohne Fehler durchläuft.
+Siehe auch "Woran erkenne ich, dass das Script funktioniert" weiter unten.
 
 4. Sobald das Script ohne Fehlermeldungen läuft kannst du es per  "NetworkDriveCheckerForWindowsScheduler.vbs" in die Windows Aufgabenplanung eintragen.
 
@@ -38,9 +38,15 @@ https://praxistipps.chip.de/windows-task-scheduler-aufgaben-in-windows-erstellen
 Wichtig ist vor allem, dass das Script entweder als Admin gestartet wird oder das "Ausführen in" Feld korrekt ausgefüllt wird:
 ![alt text](https://raw.githubusercontent.com/farOverNinethousand/networkDriveChecker/master/Screenshots/2018_11_11_Screenshot_Windows_Aufgabenplanung_Starten_in.png "Windows Aufgabenplanung")
 
-5. Teste das Script innerhalb der Aufgabenplanung, indem du die Aufgabe markierst und rechts auf "Ausführen" klickst.
-Funktioniert alles einwandfrei, solltest du während der Ausführung sehen, dass im Explorer Netzlaufwerke erstellt- und wieder gelöscht werden.
-Sollte es wiederholt zu Problemen bei der Ausführung kommen, wird neben dem roten Text auch eine Fehlermeldung als Dialog angezeigt (siehe auch Einstellungsmöglichkeiten des Scripts).
+5. Teste das Script nochmals innerhalb der Aufgabenplanung, indem du die Aufgabe markierst und rechts auf "Ausführen" klickst.
+Siehe auch "Woran erkenne ich, dass das Script funktioniert".
+
+## Woran erkenne ich, dass das Script funktioniert?
+
+1. Während der Ausführung ist im Explorer erkennbar, wie Netzlaufwerke erscheinen und verschwinden.
+2. Nach der Ausführung erscheint keine Fehlermeldung und im Ordner in dem das Script gestartet wurde liegt eine Datei namens "NetworkDriveCheckerLog.txt".
+Wenn es keine Fehler gab sollte der Inhalt dieser Datei in etwa so aussehen (Beispiel mit vier Accounts):
+Letzte Ausfuehrung: 08.09.2019 | 4 Accounts geprueft | Davon erfolgreich: 4 | Davon fehlgeschlagen: 0
 
 ## Welche Einstellungsmöglichkeiten habe ich im Script (nur die wichtigen)?
 
