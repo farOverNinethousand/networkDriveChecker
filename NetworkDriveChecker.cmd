@@ -2,13 +2,14 @@
 REM Main purpose: Keep Bitrix24.de Accounts alive: https://www.mydealz.de/deals/100gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-1232057
 
 :start
-title NetworkDriveChecker v.1.33 by over_nine_thousand - MyDealz
+title NetworkDriveChecker v.1.34 by over_nine_thousand - MyDealz
 
 REM ----------------------------------------------- Einstellungen START -----------------------------------------------
 REM -------------- Zugangsdaten hier eintragen --------------
 REM Fuer jeden Account muessen eine subdomain, ein username(E-Mail) und Passwort eingetragen werden!
 REM Es sind VIER Beispiel-Eintraege vorhanden.
-REM Traegt man z.B. nur einen Account ein, muessen jeweils die anderen (DREI) Beispiel-Eintraege geloescht werden!
+REM Traegt man z.B. nur einen Account ein, muessen jeweils die anderen (DREI) Beispiel-Eintraege bei 'subdomains', 'usernames' und 'passwords' geloescht werden!
+REM Hier NUR die Subdomain eintragen, NICHT "meine-subdomain.bitrix24.de" sondern NUR "meine-subdomain" .
 SET "subdomains[0]=test1-bla"
 SET "subdomains[1]=test2-bla"
 SET "subdomains[2]=test3-bla"
@@ -26,8 +27,8 @@ SET "passwords[3]=password4"
 
 REM Einstellungen basics - diese muessen trotzdem meist nicht angepasst werden!!
 REM 'protocol' und 'domain' nur aendern, falls Accounts einer komplett anderen Webseite geprueft werden sollen!
-SET protocol=https://
-SET domain=bitrix24.de
+SET "protocol=https://"
+SET "domain=bitrix24.de"
 REM Das ist der Standard-Pfad, den alle neuen bitrix24 Accounts haben. Sofern man die Standard-Ordner loescht, muss man diesen Wert hier anpassen! Achtung! Dieser Pfad muss unter allen eingetragenen Accounts existieren!
 SET "relative_webdav_path=/company/personal/user/1/disk/path/Offene sichtbare Gruppe/"
 REM Hier festen Laufwerksbuchstaben setzen falls dieser nicht automatisch gewaehlt werden soll (Beispiel: SET driveletter=A: - den Doppelpunkt am Ende nicht vergessen!)
@@ -354,18 +355,22 @@ REM Show complete result
 echo %numberof_accounts% Accounts geprueft ^| Davon erfolgreich: %numberof_successful_accounts% ^| Davon fehlgeschlagen: !numberof_failed_accounts!
 echo Fehler: !account_failure_text_1!
 echo !account_failure_text_2!
-echo Moegliche Fehlerursachen:
+echo Tipps zur Fehlerbehebung:
 echo Hast du gerade keine Internetverbindung?
-echo Blockiert deine Firewall den Zugriff zu !subdomains[0]!.!domain! oder einer der anderen ^^(Sub-^^)Domains sofern du mehrere eingetragen hast?
-echo Hast du dieses Script direkt nach dem Start deines Betriebssystems gestartet? Dann muss es vor der Ausfuehrung vielleicht laenger warten bis die Netzwerkverbindungen hergestellt sind - erhoehe den folgenden Wert im Script: waittime_seconds_before_start
-REM In Tests funktionierten selbst korrekt maskierte Sonderzeichen nicht. Daher sollte man die Verwendung dieser vermeiden.
-echo Hast du vor kurzem dein Passwort geaendert und vergessen, es in diesem Script anzupassen?
+echo In ^'subdomains^' sollte NICHT die Hauptdomain stehen ^(aktuelle Hauptdomain ^= ^'!domain!^'^) - folgender Host ergibt sich z.B. aus Domain + Subdomain deines ersten Accounts und muss existieren: !subdomains[0]!.!domain! 
+echo Blockiert deine Firewall den Zugriff zu !subdomains[0]!.!domain! oder einer der anderen ^(Sub-^)Domains deiner Accounts sofern du mehrere eingetragen hast?
+echo Hast du vor kuerzlich eine deiner Domains ^(z.B. !subdomains[0]!^) geaendert und vergessen, diese im Script anzupassen?
+echo Hast du vor kurzem dein Passwort ueber die !domain! Webseite geaendert und vergessen, es in diesem Script anzupassen?
 echo Hast du Sonderzeichen im Passwort?
-echo Vermeide Sonderzeichen, insbesondere folgende: Leerzeichen und folgende Zeichen: ^| %% ^^ ^& ^< ^> ^' ^=
-echo Getestete und funktionierende Sonderzeichen: *
-echo Hast du vor kuerzlich eine deiner Domains ^(z.B. !subdomains[0]!^) geaendert?
-echo Hast du die Standard-Ordnerstruktur von bitrix24 geloescht? Dann musst du auch 'relative_webdav_path' im Script anpassen^^!^^!
-echo Pruefe, ob du das Netzlaufwerk manuell hinzufuegen kannst: https://helpdesk.bitrix24.de/open/8546673/
+REM 2019-09-11: In meinen Tests funktionierten selbst korrekt maskierte Sonderzeichen nicht. Daher sollte man die Verwendung dieser vermeiden.
+echo Vermeide Sonderzeichen im Passwort - insbesondere folgende: Leerzeichen und folgende Zeichen: ^| %% ^^ ^& ^< ^> ^' ^=
+echo Falls du dennoch Sonderzeichen verwenden moechtest, musst du diese ggf. im Script ^'maskieren^' - hier eine Tabelle dazu: https://www.robvanderwoude.com/escapechars.php
+echo In meinen Tests konnte ich trotz Maskierung nur wenige Sonderzeichen verwenden - Tipps dazu gerne per Github Issue oder PN an mich schicken ;^)
+echo Getestete und funktionierende Sonderzeichen^(keine Maskierung notwendig^): *
+echo Hast du die Standard-Ordnerstruktur von bitrix24 geloescht? Dann musst du auch ^'relative_webdav_path^' im Script anpassen^^!^^!
+echo Hast du dieses Script direkt nach dem Start deines Betriebssystems ^(automatisiert?^) gestartet? Dann muss es vor der Ausfuehrung vielleicht laenger warten bis die Netzwerkverbindungen hergestellt sind - erhoehe den folgenden Wert im Script: waittime_seconds_before_start
+echo Pruefe, ob du das Netzlaufwerk manuell hinzufuegen kannst - klappt das nicht ist klar, dass auch das Script nicht funktionieren kann: https://helpdesk.bitrix24.de/open/8546673/
+echo Um genauere Fehlerausgaben zu erhalten, aendere die Zeile ^'enable_debug_mode=false^' zu ^'enable_debug_mode=true^' und lasse dieses Script erneut laufen.
 goto :bad_ending
 
 :error_windows_xp_unsupported

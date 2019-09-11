@@ -4,18 +4,19 @@ color 0a
 
 REM ----------------------------------------------- Einstellungen START -----------------------------------------------
 REM Logindaten START
-SET subdomain=test-test
+SET "subdomain=test-test"
 SET "username=over9k_not_my_real_mail@web.de"
 SET "password=testPW"
 REM Logindaten ENDE
 
-SET protocol=https://
-SET domain=bitrix24.de
+SET "protocol=https://"
+SET "domain=bitrix24.de"
 SET "relative_webdav_path=/company/personal/user/1/disk/path/Offene sichtbare Gruppe/"
+REM Ein Doppelpunkt wird spaeter noch hinter den Laufwerksbuchstaben gesetzt
+SET driveletter=N
 REM ----------------------------------------------- Einstellungen ENDE -----------------------------------------------
 
 SET full_webdav_path=!protocol!!subdomain!.!domain!!relative_webdav_path!
-SET driveletter=Z
 SET driveletter=!driveletter!:
 
 echo Zielpfad: !full_webdav_path!

@@ -23,6 +23,7 @@ Die dazugehörige Domain siehst du in der Adresszeile deines Browsers, wenn du d
 
 Wichtig: Lösche die restlichen Dummy-Einträge falls du z.B. nur einen Account hast (in dem Fall die Zeilen 'SET subdomains[1]=test2-bla' usw. löschen.)
 Außerdem wichtig: Vermeide Sonderzeichen im Passwort - es gibt nur wenige, die erlaubt sind.
+Mehr Infos zur Verwendung von Sonderzeichen siehe weiter unten.
 
 Veranschaulichung:
 ![alt text](https://raw.githubusercontent.com/farOverNinethousand/networkDriveChecker/master/Screenshots/2019_09_06_Beispiel_Accounts_eintragen.png "Veranschaulichung Zugangsdaten in Script eintragen")
@@ -67,6 +68,12 @@ Diese Werte sollten nur verstellt werden wenn man weiß, was man tut.
 
 SET enable_debug_mode=true|false --> Zeigt genauere Ausgaben zu dem was aktuell passiert.
 Ist für normale Anwender unnötig, da das zu sehr vielen Ausgaben führt und man schnell den Überblick verliert.
+
+## Ich will trotzdem Sonderzeichen im Passwort verwenden, wie geht das?
+Einige Zeichen müssen "maskiert" werden, da das Script sonst nicht mehr funktionieren würde.
+Eine Liste dazu findet sich z.B. hier: https://www.robvanderwoude.com/escapechars.php
+
+Stand 11.09.2019: Ich selbst habe auch mit Maskierung nur wenige Sonderzeichen verwenden können. Falls sich jemand besser damit auskennt, kontaktiert mich gerne per GitHub Issue ;)
 
 ## Bei mir werden keine Logdateien erstellt - was kann ich tun?
 Je nach dem wo das Script liegt kann es sein, dass Adminrechte zur Ausführung benötigt werden (zum Beispiel direkt auf C:).
