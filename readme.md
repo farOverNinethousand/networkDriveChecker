@@ -35,7 +35,16 @@ Siehe auch "Woran erkenne ich, dass das Script funktioniert" weiter unten.
 
 https://praxistipps.chip.de/windows-task-scheduler-aufgaben-in-windows-erstellen_28308
 
-Wichtig ist vor allem, dass das Script entweder als Admin gestartet wird oder das "Ausführen in" Feld korrekt ausgefüllt wird:
+Wichtig ist vor allem, dass das Script entweder als Admin gestartet wird oder das "Ausführen in" Feld korrekt ausgefüllt wird!
+Beispiel:
+
+Das Haupt-Script befindet sich hier: 
+`C:\Users\deinWinBenutzername\Documents\00_WindowsSchedulerScripte\bitrix24_Private_TEST\NetworkDriveChecker.cmd`
+Dann sollte das Start-Script (das du im 'Programm/Skript' Feld angibst) hier liegen:
+`C:\Users\deinWinBenutzername\Documents\00_WindowsSchedulerScripte\bitrix24_Private_TEST\NetworkDriveCheckerForWindowsScheduler.vbs`
+Unter 'Starten in' gibst du dann folgendes an:
+`C:\Users\deinWinBenutzername\Documents\00_WindowsSchedulerScripte\bitrix24_Private_TEST`
+
 ![alt text](https://raw.githubusercontent.com/farOverNinethousand/networkDriveChecker/master/Screenshots/2018_11_11_Screenshot_Windows_Aufgabenplanung_Starten_in.png "Windows Aufgabenplanung")
 
 5. Teste das Script nochmals innerhalb der Aufgabenplanung, indem du die Aufgabe markierst und rechts auf "Ausführen" klickst.
