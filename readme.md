@@ -40,8 +40,10 @@ Beispiel:
 
 Das Haupt-Script befindet sich hier: 
 `C:\Users\deinWinBenutzername\Documents\00_WindowsSchedulerScripte\bitrix24_Private_TEST\NetworkDriveChecker.cmd`
+
 Dann sollte das Start-Script (das du im 'Programm/Skript' Feld angibst) hier liegen:
 `C:\Users\deinWinBenutzername\Documents\00_WindowsSchedulerScripte\bitrix24_Private_TEST\NetworkDriveCheckerForWindowsScheduler.vbs`
+
 Unter 'Starten in' gibst du dann folgendes an:
 `C:\Users\deinWinBenutzername\Documents\00_WindowsSchedulerScripte\bitrix24_Private_TEST`
 
