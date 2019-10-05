@@ -14,14 +14,29 @@ Infos zu einer möglichen Linux Version finden sich weiter unten in diesem Dokum
 
 1. Kopiere alle Dateien dieses Projektes in einen Ordner unterhalb des Benutzerordners zum Beispiel: "C:\Users\DeinBenutzername\Documents\networkDriveChecker"
 
-2. Trage deine (bitrix24.de) Zugangsdaten in das Script (NetworkDriveChecker.cmd) ein:
-Ganz oben im Script unter 'subdomains', 'usernames' und 'passwords'.
-Jeder Account hat quasi drei Zugangsdaten. Benutzername(bzw. Email) und Passwort solltest du kennen.
+2. Trage deine (bitrix24.de) Zugangsdaten in der Datei AccountSettings.cmd ein.
+Jeder Account hat quasi drei Zugangsdaten. E-Mail (oder Telefonnummer) und Passwort solltest du kennen.
 Die dazugehörige Domain siehst du in der Adresszeile deines Browsers, wenn du dich über diesen einloggst und im Menü Links auf "Bitrix24.drive" klickst:
 
 `https://HIER_STEHT_DEINE_SUB_DOMAIN.bitrix24.de/company/personal/user/1/disk/path/`
 
-Wichtig: Lösche die restlichen Dummy-Einträge falls du z.B. nur einen Account hast (in dem Fall die Zeilen 'SET subdomains[1]=test2-bla' usw. löschen.)
+Beispiel:
+
+Benutzername/Mail: test@gmail.com
+
+Passwort: test123
+
+Subdomain: b24-xxxyyy
+
+Im Script würde das dann so aussehen:
+
+SET "subdomains[0]=b24-xxxyyy"
+
+SET "usernames[0]=test@gmail.com"
+
+SET "passwords[0]=test123"
+
+Wichtig: Lösche die restlichen Dummy-Einträge falls du wie im Beispiel nur einen Account hast (in dem Fall die Zeilen 'SET subdomains[1]=test2-bla' usw. löschen.)
 Außerdem wichtig: Vermeide Sonderzeichen im Passwort - es gibt nur wenige, die erlaubt sind.
 Mehr Infos zur Verwendung von Sonderzeichen siehe weiter unten.
 
@@ -59,11 +74,15 @@ Siehe auch "Woran erkenne ich, dass das Script funktioniert".
 Wenn es keine Fehler gab sollte der Inhalt dieser Datei in etwa so aussehen (Beispiel mit vier Accounts):
 Letzte Ausfuehrung: 08.09.2019 | 4 Accounts geprueft | Davon erfolgreich: 4 | Davon fehlgeschlagen: 0
 
-## Welche Einstellungsmöglichkeiten habe ich im Script (nur die wichtigen)?
+## Welche Account-Einstellungsmöglichkeiten habe ich (AccountSettings.cmd)?
+* WebDAV Pfad anpassen (nötig wenn man z.B. die Standardordner von bitrix24 geloescht hat): relative_webdav_path
+* Protokoll einstellen (standard ist HTTPS): protocol
+* Domain einstellen (standard ist bitrix24.de): domain
+
+## Welche Script-Einstellungsmöglichkeiten habe ich (Settings.cmd)?
 
 1. Allgemeine Einstellungen
 * Immer einen bestimmten Laufwerksbuchstaben erzwingen: SET driveletter=Z: (hier den Doppelpunkt nicht vergessen!)
-* WebDAV Pfad anpassen (nötig wenn man z.B. die Standardordner von bitrix24 geloescht hat): relative_webdav_path
 * Name der Testdatei selbst festlegen: SET filename=testname.txt
 * Festlegen, ob nach erfolgreichem Login eine Testdatei erstellt und wieder gelöscht werden soll: SET create_and_delete_dummyfile=true|false
 * SET display_welcome_message_on_first_start=true|false --> 'Willkommen' Text bei der ersten Ausführung des Scripts zeigen/nicht zeigen
@@ -112,7 +131,7 @@ https://www.mydealz.de/deals/100-gb-cloud-speicher-dauerhaft-gratis-dsgvo-konfor
 ## Der folgende Teil richtet sich ausschließlich an bitrix24.de User:
 
 ## Warum wurde dieses Script ursprünglich geschrieben?
-Um automatisiert die Accounts des Anbieters bitrix24.de aktiv zu halten und wegen eines Deals auf MyDealz durch den man sich dort 100GB Cloud Speicher permanent holen konnte: https://www.mydealz.de/deals/100gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-1232057
+Um automatisiert die Accounts des Anbieters bitrix24.de aktiv zu halten und wegen eines Deals auf dem Schnäppchenportal MyDealz durch den man sich dort 100GB Cloud Speicher permanent holen konnte: https://www.mydealz.de/deals/100gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-1232057
 
 Update 05.09.2019 es gibt den Deal wieder und daher auch ein Update: https://www.mydealz.de/deals/100-gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-kostenlos-199-1429208
 
@@ -121,6 +140,13 @@ Man erhält nach 4 Wochen (hier 33 Tage) die erste Warnung ("Ihr Account wird in
 
 ## Wie oft sollte man das Script ausführen, damit Bitrix24 Accounts sicher nicht gelöscht werden?
 Mindestens einmal pro Woche.
+
+## Zählt ein Login per Bitrix24 App auch als Login?
+Ja, aber wenn du dieses Script verwendest brauchst du die App nicht ;)
+
+## Wo kann ich sehen, wie viel Speicher ich insgesamt habe?
+Links bei der Leiste wo oben "Activity Stream" steht auf "Abonnement" klicken.
+Falls das nicht direkt sichtbar ist, erst unten auf "Mehr" klicken.
 
 ## Troubleshooting für Windows XP Benutzer
 Windows XP hat leider keine https Unterstützung für WebDAV daher wird man beim Start dieses Scripts idR eine 'Systemfehler 67' oder auch 'Systemfehler 5' Fehlermeldung bekommen.
