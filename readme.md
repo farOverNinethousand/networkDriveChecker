@@ -30,11 +30,11 @@ Subdomain: b24-xxxyyy
 
 Im Script würde das dann so aussehen:
 
-SET "subdomains[0]=b24-xxxyyy"
+`SET "subdomains[0]=b24-xxxyyy"`
 
-SET "usernames[0]=test@gmail.com"
+`SET "usernames[0]=test@gmail.com"`
 
-SET "passwords[0]=test123"
+`SET "passwords[0]=test123"`
 
 Wichtig: Lösche die restlichen Dummy-Einträge falls du wie im Beispiel nur einen Account hast (in dem Fall die Zeilen 'SET subdomains[1]=test2-bla' usw. löschen.)
 Außerdem wichtig: Vermeide Sonderzeichen im Passwort - es gibt nur wenige, die erlaubt sind.
