@@ -8,7 +8,13 @@ Damit kann man z.B. Accounts vor einer Löschung durch Inaktivität zu bewahren 
 
 ## Kompatibilität
 Das Script sollte auf allen Betriebssystemen nach Windows XP laufen (auf XP nicht, dazu mehr am Ende dieser Readme!)
-Infos zu einer möglichen Linux Version finden sich weiter unten in diesem Dokument.
+
+## Gibt es eine Version für Linux?
+Von mir nicht, aber vom GitHub Benutzer 'ka223':
+https://github.com/ka223/webdavTester
+
+Codebasis:
+https://www.mydealz.de/deals/100-gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-kostenlos-199-1429208?page=4#comment-22802200
 
 ##  Installation
 
@@ -122,11 +128,6 @@ Du hast vermutlich die "NetworkDriveChecker.cmd" in den Aufgabenplaner/Autostart
 
 ## Ich habe einen Fehler gefunden oder möchte ein neues Feature - wie kann ich dich kontaktieren?
 Entweder über GitHub oder über MyDealz: https://www.mydealz.de/profile/over_nine_thousand/overview#activity
-
-## Wie mache ich das unter Linux?
-Sorry, dafür gibt es noch keine Lösung in diesem Repository.
-Eine Mögliche Lösung könnte wie folgt aussehen:
-https://www.mydealz.de/deals/100-gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-kostenlos-199-1429208?page=4#comment-22802200
 
 ## Der folgende Teil richtet sich ausschließlich an bitrix24.de User:
 
