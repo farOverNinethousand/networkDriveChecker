@@ -2,37 +2,43 @@
 REM Main purpose: Keep Bitrix24.de Accounts alive: https://www.mydealz.de/deals/100gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-1232057
 
 :start
-title NetworkDriveChecker v.1.39 by over_nine_thousand
-
-REM Load account settings (Mainly Logindata)
-call AccountSettings.cmd
-REM Load all other settings
-call Settings.cmd
+title NetworkDriveChecker v.1.40 by over_nine_thousand
 
 REM recommended according to: http://steve-jansen.github.io/guides/windows-batch-scripting/part-2-variables.html
 SETLOCAL ENABLEEXTENSIONS
 REM Important for function which generates the random filename and our 'Array': https://ss64.com/nt/delayedexpansion.html
 SETLOCAL enableDelayedExpansion
 SET me=%~n0
+REM Our current directory - use this to read/write files to prevent issues in admin mode: https://stackoverflow.com/questions/31622469/why-does-run-as-administrator-change-sometimes-batch-files-current-director
 SET parent=%~dp0
 
 color 0a
 
+if exist "!parent!AccountSettings.cmd" (
+REM echo Selfcheck OK
+) else (
+REM This should NEVER happen
+echo Selfcheck FAILED
+goto :bad_ending
+)
+
+REM Load account settings (Mainly Logindata)
+call "!parent!AccountSettings.cmd"
+REM Load all other settings
+call "!parent!Settings.cmd"
+
 REM Check for unsupported OS
 REM thx: https://stackoverflow.com/questions/13212033/get-windows-version-in-a-batch-file (although this script does not find my windows 7 correctly but here we only want to identify XP)
 ver | find "XP" > nul
-if %ERRORLEVEL% == 0 if defined force_allow_windows_xp if "%force_allow_windows_xp%" == "false" (
-	goto :error_windows_xp_unsupported
-)
 if %ERRORLEVEL% == 0 (
-	echo Warnung: Windows XP wird nicht unterstuetzt, aber das Script wird es trotzdem versuchen, da 'force_allow_windows_xp' auf true gesetzt wurde ...
+	goto :error_windows_xp_unsupported
 )
 
 REM Check for write access and show warning if we do not have write access
-type NUL > !logfile_test_write_access_name!
-if exist !logfile_test_write_access_name! (
+type NUL > !parent!!logfile_test_write_access_name!
+if exist !parent!!logfile_test_write_access_name! (
 	REM Delete testfile again
-	DEL !logfile_test_write_access_name!
+	DEL !parent!!logfile_test_write_access_name!
 ) else (
 	cls
 	color 04
@@ -44,7 +50,7 @@ if exist !logfile_test_write_access_name! (
 	echo 2. Du hast dieses Script einfach so gestartet? Gehe sicher, dass sich das Script unterhalb des Benutzerordners befindet ^("C:\Users\DeinBenutzername\bla"^) oder starte es als Admin.
 	REM Only wait here if the user wants this
 	if defined waittime_seconds_continue_on_non_fatal_error if !waittime_seconds_continue_on_non_fatal_error! GTR 0 (
-		echo 3. Mache nichts - in !waittime_seconds_continue_on_non_fatal_error! Sekunden wird die Ausfuehrung automatisch fortgesetzt ...
+		echo 3. In !waittime_seconds_continue_on_non_fatal_error! Sekunden wird die Ausfuehrung automatisch fortgesetzt ...
 		echo Warte !waittime_seconds_continue_on_non_fatal_error! Sekunden ...
 		ping -n !waittime_seconds_continue_on_non_fatal_error! localhost >NUL
 	)
@@ -55,11 +61,11 @@ if exist !logfile_test_write_access_name! (
 )
 
 REM Check for old logfiles or first start
-if exist !logfile_name! (
+if exist !parent!!logfile_name! (
 	echo !separator!
 	echo Inhalt des letzten Logs:
 	echo !separator!
-	type !logfile_name!
+	type !parent!!logfile_name!
 ) else (
 	REM First start - display welcome message if wished by user
 	if defined display_welcome_message_on_first_start if "%display_welcome_message_on_first_start%" == "true" (
@@ -200,9 +206,9 @@ if %position% LSS %numberof_accounts% (
 
 
 REM Delete old logfile
-if exist !logfile_name! del !logfile_name!
+if exist !parent!!logfile_name! del !parent!!logfile_name!
 REM Write new logfile
-@echo Letzte Ausfuehrung: %date% ^| %numberof_accounts% Accounts geprueft ^| Davon erfolgreich: %numberof_successful_accounts% ^| Davon fehlgeschlagen: !numberof_failed_accounts! >> %logfile_name%
+@echo Letzte Ausfuehrung: %date% ^| %numberof_accounts% Accounts geprueft ^| Davon erfolgreich: %numberof_successful_accounts% ^| Davon fehlgeschlagen: !numberof_failed_accounts! >> !parent!!logfile_name!
 
 REM Display results - clear screen if there were no errors
 if !numberof_failed_accounts! GEQ 1 (
@@ -257,7 +263,7 @@ REM Benutzer hat vermutlich Syntaxfehler in den Arrays mit den Zugangsdaten
 :error_login_failures
 REM Write usernames of failed accounts in logfile
 
-@echo Fehlgeschlagene Accounts !failed_accounts! >> !logfile_name!
+@echo Fehlgeschlagene Accounts !failed_accounts! >> !parent!!logfile_name!
 REM ----------- Handling for too many failures START -----------
 if exist !logfile_failed_times_name! (
 	SET /P failedtimes=<!logfile_failed_times_name!
@@ -308,11 +314,6 @@ goto :bad_ending
 cls
 color 04
 echo Fehler: Windows XP wird nicht unterstuetzt, da es keine https Unterstuetzung fuer WebDAV hat^^!
-echo Helfen kann eine Kombination mehrerer Workarounds ^(oder der Umstieg auf ein neueres Microsoft Betriebssystem^):
-echo http://wazem.blogspot.com/2013/05/how-to-map-secure-webdav-share-on.html
-echo und:
-echo https://support.microsoft.com/de-de/help/841215/error-message-when-you-try-to-connect-to-a-windows-sharepoint-document
-echo Damit diese Warnung beim naechsten Versuch unter Windows XP nicht angezeigt wird, setze 'force_allow_windows_xp' auf 'true'
 goto :bad_ending
 
 
