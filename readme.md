@@ -68,12 +68,14 @@ Siehe auch "Woran erkenne ich, dass das Script funktioniert".
 1. Während der Ausführung ist im Explorer erkennbar, wie Netzlaufwerke erscheinen und verschwinden.
 2. Nach der Ausführung erscheint keine Fehlermeldung und im Ordner in dem das Script gestartet wurde liegt eine Datei namens "NetworkDriveCheckerLog.txt".
 Wenn es keine Fehler gab sollte der Inhalt dieser Datei in etwa so aussehen (Beispiel mit vier Accounts):
+```
 Letzte Ausfuehrung: 08.09.2019 | 4 Accounts geprueft | Davon erfolgreich: 4 | Davon fehlgeschlagen: 0
+```
 
 ## Welche Account-Einstellungsmöglichkeiten habe ich (AccountSettings.cmd)?
 * WebDAV Pfad anpassen (nötig wenn man z.B. die Standardordner von bitrix24 geloescht hat): relative_webdav_path
-* Protokoll einstellen (standard ist HTTPS): protocol
-* Domain einstellen (standard ist bitrix24.de): domain
+* Protokoll einstellen (standard = HTTPS): protocol
+* Domain einstellen (standard = bitrix24.de): domain
 
 ## Welche Script-Einstellungsmöglichkeiten habe ich (Settings.cmd)?
 
