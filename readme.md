@@ -46,7 +46,7 @@ Siehe auch "Woran erkenne ich, dass das Script funktioniert" weiter unten.
 
 https://praxistipps.chip.de/windows-task-scheduler-aufgaben-in-windows-erstellen_28308
 
-Wichtig ist vor allem, dass das Script entweder als Admin gestartet wird oder das "Ausführen in" Feld korrekt ausgefüllt wird und (wenn du dich nicht gut auskennst) sich **keine Leerzeichen im Pfad zum Script befinden!**
+Wichtig ist vor allem, dass das Script entweder als Admin gestartet wird oder das "Ausführen in" Feld korrekt ausgefüllt wird und sich **keine Leerzeichen im Pfad zum Script befinden** (falls Leerzeichen vorhanden sind, muss ein Anführungszeichen an den Anfang und das ende des Pfades)!
 Beispiel:
 
 Das Haupt-Script befindet sich hier: 
