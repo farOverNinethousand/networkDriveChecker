@@ -42,23 +42,22 @@ Veranschaulichung:
 3\. Starte die "NetworkDriveChecker.cmd" einmal testweise per Doppelklick und gehe sicher, dass es ohne Fehler durchläuft.
 Siehe auch "Woran erkenne ich, dass das Script funktioniert" weiter unten.
 
-4\. Sobald das Script ohne Fehlermeldungen läuft kannst du es per  "NetworkDriveCheckerForWindowsScheduler.vbs" in die Windows Aufgabenplanung eintragen.
+4\. Sobald das Script ohne Fehlermeldungen läuft, kannst du es per  "NetworkDriveCheckerForWindowsScheduler.vbs" in die Windows Aufgabenplanung eintragen.
 
 https://praxistipps.chip.de/windows-task-scheduler-aufgaben-in-windows-erstellen_28308
 
-Wichtig ist vor allem, dass das Script entweder als Admin gestartet wird oder das "Ausführen in" Feld korrekt ausgefüllt wird und sich **keine Leerzeichen im Pfad zum Script befinden** (falls Leerzeichen vorhanden sind, muss ein Anführungszeichen an den Anfang und das Ende des Pfades)!  
+Wichtig ist vor allem, dass das Script entweder als Admin gestartet wird oder das "Ausführen in" Feld korrekt ausgefüllt ist und sich **keine Leerzeichen im Pfad zum Script befinden** (falls Leerzeichen vorhanden sind, muss ein Anführungszeichen an den Anfang- und das Ende des Pfades)!  
 Beispiel:
 Das Haupt-Script befindet sich hier:  
 `C:\Users\deinWinBenutzername\Documents\00_WindowsSchedulerScripte\bitrix24_Private_TEST\NetworkDriveChecker.cmd`  
 Dann sollte das Start-Script (das du im 'Programm/Skript' Feld angibst) hier liegen:  
-`C:\Users\deinWinBenutzername\Documents\00_WindowsSchedulerScripte\bitrix24_Private_TEST\NetworkDriveCheckerForWindowsScheduler.vbs`
+`C:\Users\deinWinBenutzername\Documents\00_WindowsSchedulerScripte\bitrix24_Private_TEST\NetworkDriveCheckerForWindowsScheduler.vbs`  
 Unter 'Starten in' gibst du dann folgendes an:  
 `C:\Users\deinWinBenutzername\Documents\00_WindowsSchedulerScripte\bitrix24_Private_TEST`  
 
 ![alt text](https://raw.githubusercontent.com/farOverNinethousand/networkDriveChecker/master/Screenshots/2018_11_11_Screenshot_Windows_Aufgabenplanung_Starten_in.png "Windows Aufgabenplanung")
 
-5\. Teste das Script nochmals innerhalb der Aufgabenplanung, indem du die Aufgabe markierst und rechts auf "Ausführen" klickst.  
-Siehe auch "Woran erkenne ich, dass das Script funktioniert".
+5\. Teste das Script nochmals innerhalb der Aufgabenplanung, indem du die Aufgabe markierst und rechts auf "Ausführen" klickst.
 
 ## Woran erkenne ich, dass das Script funktioniert?
 
@@ -69,12 +68,12 @@ Wenn es keine Fehler gab sollte der Inhalt dieser Datei in etwa so aussehen (Bei
 Letzte Ausfuehrung: 08.09.2019 | 4 Accounts geprueft | Davon erfolgreich: 4 | Davon fehlgeschlagen: 0
 ```
 
-## Welche Account-Einstellungsmöglichkeiten habe ich (AccountSettings.cmd)?
+## Welche Account-Einstellungsmöglichkeiten gibt es (AccountSettings.cmd)?
 * WebDAV Pfad anpassen (nötig wenn man z.B. die Standardordner von bitrix24 geloescht hat): relative_webdav_path
 * Protokoll einstellen (standard = HTTPS): protocol
 * Domain einstellen (standard = bitrix24.de): domain
 
-## Welche Script-Einstellungsmöglichkeiten habe ich (Settings.cmd)?
+## Welche Script-Einstellungsmöglichkeiten gibt es (Settings.cmd)?
 
 1\. Allgemeine Einstellungen
 * Immer einen bestimmten Laufwerksbuchstaben erzwingen: SET driveletter=Z: (hier den Doppelpunkt nicht vergessen!)
@@ -83,8 +82,8 @@ Letzte Ausfuehrung: 08.09.2019 | 4 Accounts geprueft | Davon erfolgreich: 4 | Da
 * SET display_welcome_message_on_first_start=true|false --> 'Willkommen' Text bei der ersten Ausführung des Scripts zeigen/nicht zeigen
 
 2\. Einstellungen zu Logging und Fehlermeldungen
-* max_failures_until_error = Max Anzahl fehlgeschlagener Script Ausführungen hintereinander --> Dann Fehlerdialog
-* SET display_error_dialog_on_too_many_failures=true|false --> Fehlerdialog zeigen oder nicht zeigen (es geht nur um die Dialogbox nicht um die Meldungen in der Kommandozeile!)
+* max_failures_until_error = Max Anzahl fehlgeschlagener Script Ausführungen hintereinander --> Ist die erreicht, erscheint ein Fehlerdialog
+* SET display_error_dialog_on_too_many_failures=true|false --> Fehlerdialog zeigen oder nicht zeigen (es geht nur um den Fehlerdialog nicht um die Meldungen in der Kommandozeile!)
 
 Beispiel: Du startest dieses Script jede Woche 1x, Fehlerdialoge sind aktiviert ('SET display_error_dialog_on_too_many_failures=true') und 'max_failures_until_error=3'.  
 Sobald das Script das dritte Mal infolge gestartet wird und es jedes Mal Fehler gab, wird so ein Dialog angezeigt:  
@@ -99,7 +98,7 @@ SET enable_debug_mode=true|false --> Zeigt genauere Ausgaben zu dem was aktuell 
 Ist für normale Anwender unnötig, da das zu sehr vielen Ausgaben führt und man schnell den Überblick verliert.
 
 ## Ich will trotzdem Sonderzeichen im Passwort verwenden, wie geht das?
-Einige Zeichen müssen "maskiert" werden, da das Script sonst nicht mehr funktionieren würde.
+Einige Zeichen müssen *maskiert* werden, da das Script sonst nicht mehr funktionieren würde.
 Eine Liste dazu findet sich z.B. hier: https://www.robvanderwoude.com/escapechars.php
 
 ## Bei mir werden keine Logdateien erstellt - was kann ich tun?
@@ -107,8 +106,8 @@ Je nach dem wo das Script liegt kann es sein, dass Adminrechte zur Ausführung b
 Starte das Script als Administrator oder lege es an einen Ort unterhalb deines Benutzerverzeichnis z.B. auf den Desktop oder im "Dokumente" Ordner (zB `C:\Users\DeinBenutzername\Documents\"`).
 
 Allgemein braucht dieses Script KEINE Adminrechte um zu funktionieren, aber um Fehlermeldungen zuverlässig anzeigen zu können sollte es in seinem Verzeichnis Schreibrechte haben!  
-Läuft alles reibungslos, sollte nach jeder Ausführung die Datei "NetworkDriveCheckerLog.txt" 'neben' dem Script erstellt/aktualisiert werden.
-## Beim Starten mit Windows bekomme ich immer die kommandozeile angezeigt, wie kann ich das unterdrücken?
+Läuft alles reibungslos, sollte nach jeder Ausführung die Datei "NetworkDriveCheckerLog.txt" *neben* dem Script erstellt/aktualisiert werden.
+## Beim Starten mit Windows bekomme ich immer die Kommandozeile angezeigt, wie kann ich das unterdrücken?
 Du hast wahrscheinlich versehentlich die Datei "NetworkDriveChecker.cmd" in den Aufgabenplaner/Autostart gelegt und nicht die "NetworkDriveCheckerForWindowsScheduler.vbs" ;)
 
 ## Ich habe einen Fehler gefunden oder möchte ein neues Feature - wie kann ich dich kontaktieren?
@@ -117,9 +116,9 @@ Entweder über GitHub oder über [MyDealz](https://www.mydealz.de/profile/over_n
 ## Extra bitrix24.de FAQ:
 
 ## Warum wurde dieses Script ursprünglich geschrieben?
-Um automatisiert die Accounts des Anbieters bitrix24.de aktiv zu halten und wegen eines [Deals auf dem Schnäppchenportal MyDealz](https://www.mydealz.de/deals/100gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-1232057) durch den man sich dort 100GB Cloud Speicher permanent holen konnte.  
+Um automatisiert die Accounts des Anbieters bitrix24.de aktiv zu halten und wegen eines [Deals auf dem Schnäppchenportal MyDealz](https://www.mydealz.de/deals/100gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-1232057) durch den man 100GB Cloud Speicher gratis ergattern konnte.  
 Bitrix24 löscht Accounts, sofern man sich nicht alle 6 Wochen mindestens einmal einloggt (man muss dafür keine Datei(en) hochladen).  
-Man erhält nach 4 Wochen (hier 33 Tage) die erste Warnung per E-Mail ("Ihr Account wird in 14 Tagen gelöscht") und nach 5 Wochen die zweite und eventuell letzte Warnung ("Ihr Account wird in 7 Tagen gelöscht").
+Man erhält nach 4 Wochen (hier 33 Tage) die erste Warnung per E-Mail ("Ihr Account wird in 14 Tagen gelöscht") und nach 5 Wochen die zweite- und eventuell letzte Warnung ("Ihr Account wird in 7 Tagen gelöscht").
 
 ## Ich habe mich bei bitrix24 registriert und vergessen, den Gutschein direkt einzugeben - wie trage ich diesen nachträglich ein?
 Links bei der Leiste wo oben "Activity Stream" steht auf "Abonnement" klicken.  
