@@ -120,6 +120,12 @@ Um automatisiert die Accounts des Anbieters bitrix24.de aktiv zu halten und wege
 Bitrix24 löscht Accounts, sofern man sich nicht alle 6 Wochen mindestens einmal einloggt (man muss dafür keine Datei(en) hochladen).  
 Man erhält nach 4 Wochen (hier 33 Tage) die erste Warnung per E-Mail ("Ihr Account wird in 14 Tagen gelöscht") und nach 5 Wochen die zweite- und eventuell letzte Warnung ("Ihr Account wird in 7 Tagen gelöscht").
 
+## Ich bekomme den Fehler `Systemfehler 67` was kann ich tun?  
+Vermutlich existiert der eingetragene Pfad nicht.  
+Falls du ein bitrix24 Benutzer bist, passe deinen `relative_webdav_path` Pfad wie folgt an.  
+Versuche es mit folgendem Wert:  
+`/company/personal/user/1/disk/path`
+
 ## Ich habe mich bei bitrix24 registriert und vergessen, den Gutschein direkt einzugeben - wie trage ich diesen nachträglich ein?
 Links bei der Leiste wo oben "Activity Stream" steht auf "Abonnement" klicken.  
 Falls das nicht direkt sichtbar ist, erst unten auf "Mehr" klicken.  
@@ -129,12 +135,13 @@ Dann auf "Gutschein aktivieren" klicken.
 Mindestens einmal pro Woche.
 
 ## Zählt ein Login per Bitrix24 App auch als Login?
-Ja aber wenn du dieses Script verwendest, brauchst du die App nicht ;)
+Ja aber wenn du dieses Script verwendest, brauchst du die Bitrix24 App nicht ;)
 
 ## Wo kann ich sehen, wie viel Speicher ich insgesamt habe?
 Links bei der Leiste wo oben "Activity Stream" steht auf "Abonnement" klicken.  
 Falls das nicht direkt sichtbar ist, erst unten auf "Mehr" klicken.  
-Falls der Deal "100 GB gratis" war, solltest du dort "105 GB" stehen haben.
+Falls der Deal "100 GB gratis" war, solltest du dort "105 GB" stehen haben.  
+**Wichtig:** Dein System (z.B. Windows) zeigt unter Umständen andere Werte im Explorer an.
 
 ## Wo finde ich meine Web-DAV Zugangsdaten, wenn ich mich mit dem Social Login (z.B. Facebook/Google) registriert habe?
 E-Mail: Mein Profil -> E-Mail  

@@ -2,7 +2,7 @@
 REM Main purpose: Keep Bitrix24.de Accounts alive: https://www.mydealz.de/deals/100gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-1232057
 
 :start
-title NetworkDriveChecker v.1.40 by over_nine_thousand
+title NetworkDriveChecker v.1.41 by over_nine_thousand
 
 REM recommended according to: http://steve-jansen.github.io/guides/windows-batch-scripting/part-2-variables.html
 SETLOCAL ENABLEEXTENSIONS
@@ -153,6 +153,7 @@ setlocal enableDelayedExpansion
 if %position% LSS %numberof_accounts% (
 	REM Clear screen after every loop if we're not in debug mode
 	if defined enable_debug_mode if "!enable_debug_mode!" == "false" cls
+    color 0a
 	REM Dateiname ist fuer jeden Durchgang minimal anders
 	call echo Pruefe Account: !user_readable_position! von !numberof_accounts! : !usernames[%position%]!
 	
@@ -166,7 +167,8 @@ if %position% LSS %numberof_accounts% (
 		SET /a numberof_successful_accounts+=1
 	) || (
 		REM Login failed - continue to next account
-		echo Fehler: !usernames[%position%]!: Zugangsdaten sind eventuell ungueltig
+		color 04
+		echo Fehler^^!^^! Zugangsdaten ungueltig??
 		REM Increase counter of failed accounts
 		SET /a numberof_failed_accounts+=1
 		REM Collect usernames of failed accounts
@@ -174,9 +176,11 @@ if %position% LSS %numberof_accounts% (
 			SET "failed_accounts=!failed_accounts!^, "
 		)
 		SET failed_accounts=!failed_accounts!!usernames[%position%]!
-		
+
 		SET /a position+=1
 		SET /a user_readable_position+=1
+		REM Wait some seconds before continuing with next account so user has enough time to read errormessage
+		ping -n 8 localhost >NUL
 		GOTO :AccountLoop 
 	)
 	REM Datei nur erstellen- und wieder loeschen falls vom Benutzer gewuenscht
@@ -321,7 +325,7 @@ goto :bad_ending
 :bad_ending
 REM One or more errors occured
 if defined waittime_seconds_on_bad_ending if !waittime_seconds_on_bad_ending! GTR 0 (
-	echo Dieses Fenster wird in !waittime_seconds_on_bad_ending! Sekunden geschlossen
+	echo Dieses Fenster wird in !waittime_seconds_on_bad_ending! Sekunden geschlossen.
 	ping -n !waittime_seconds_on_bad_ending! localhost >NUL
 ) else (
 	echo Druecke ENTER zum Beenden
@@ -348,7 +352,7 @@ if defined enable_debug_mode if "!enable_debug_mode!" == "true" (
 )
 echo ERFOLG ^| ALLE !numberof_accounts! Account^(s^) wurden erfolgreich geprueft :^)
 if defined waittime_seconds_on_successful_ending if !waittime_seconds_on_successful_ending! GTR 0 (
-	echo Dieses Fenster wird in !waittime_seconds_on_successful_ending! Sekunden geschlossen
+	echo Dieses Fenster wird in !waittime_seconds_on_successful_ending! Sekunden geschlossen.
 	ping -n !waittime_seconds_on_successful_ending! localhost >NUL
 )
 exit
