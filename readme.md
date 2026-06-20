@@ -4,7 +4,7 @@ Prüft ein- oder mehrere (passwortgeschützte) Netzlaufwerke | bewahrt Cloud Acc
 
 ## Was macht das Script?
 Es loggt sich automatisch in Netzlaufwerke ein und löscht diese wieder.
-Damit kann man z.B. Accounts vor einer Löschung durch Inaktivität zu bewahren (Beispiel-Anbieter: bitrix24.de) oder einfach nur Zugänge prüfen.
+Damit kann man z.B. Accounts vor einer Löschung durch Inaktivität bewahren (Beispiel-Anbieter: bitrix24.de) oder einfach nur Zugänge prüfen.
 
 ## Kompatibilität
 Das Script läuft auf allen Windows Betriebssystemen nach Windows XP.
@@ -14,7 +14,7 @@ Nicht von genau diesem Script, aber folgende Optionen gibt es:
 * Option 1: [bitrix24-account-avoid-inactivity-deletion.sh](https://github.com/mesche/common-scripts/blob/main/bitrix24-account-avoid-inactivity-deletion.sh) von MyDealz User [esche](https://www.mydealz.de/profile/esche)
 * Option 2: [webdavTester](https://github.com/ka223/webdavTester)
 
-##  Installation
+## Installation
 
 1\. Kopiere alle Dateien dieses Projektes in einen Ordner **unterhalb** des Benutzerordners zum Beispiel: `C:\Users\DeinBenutzername\Documents\networkDriveChecker`  
 2\. Trage deine (bitrix24.de) Zugangsdaten in der Datei AccountSettings.cmd ein.
@@ -115,34 +115,55 @@ Entweder über GitHub oder über [MyDealz](https://www.mydealz.de/profile/over_n
 
 ## Extra bitrix24.de FAQ:
 
-## Warum wurde dieses Script ursprünglich geschrieben?
+### Warum wurde dieses Script ursprünglich geschrieben?
 Um automatisiert die Accounts des Anbieters bitrix24.de aktiv zu halten und wegen eines [Deals auf dem Schnäppchenportal MyDealz](https://www.mydealz.de/deals/100gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-1232057) durch den man 100GB Cloud Speicher gratis ergattern konnte.  
 Bitrix24 löscht Accounts, sofern man sich nicht alle 6 Wochen mindestens einmal einloggt (man muss dafür keine Datei(en) hochladen).  
 Man erhält nach 4 Wochen (hier 33 Tage) die erste Warnung per E-Mail ("Ihr Account wird in 14 Tagen gelöscht") und nach 5 Wochen die zweite- und eventuell letzte Warnung ("Ihr Account wird in 7 Tagen gelöscht").
 
-## Ich bekomme den Fehler `Systemfehler 67` was kann ich tun?  
+### Ich bekomme den Fehler `Systemfehler 67` was kann ich tun?  
 Vermutlich existiert der eingetragene Pfad nicht.  
 Falls du ein bitrix24 Benutzer bist, passe deinen `relative_webdav_path` Pfad wie folgt an.  
 Versuche es mit folgendem Wert:  
 `/company/personal/user/1/disk/path`
 
-## Ich habe mich bei bitrix24 registriert und vergessen, den Gutschein direkt einzugeben - wie trage ich diesen nachträglich ein?
+Ein weiterer möglicher Grund (besonders unter Windows 10/11 beobachtet): Der **WebClient-Dienst** (WebDAV-Mini-Redirector von Windows), der für `net use` auf `https://`-WebDAV-Pfade benötigt wird, läuft nicht oder startet nicht automatisch.  
+Prüfen kannst du das z.B. mit (als Administrator in einer Kommandozeile):
+```
+sc query webclient
+```
+Steht dort nicht "RUNNING", versuche den Dienst manuell zu starten:
+```
+sc start webclient
+```
+
+### Wie kann ich `net use` unabhängig vom Script manuell testen?
+Um Login-Probleme einzugrenzen, kannst du folgenden Befehl direkt in einer Kommandozeile ausprobieren (Werte entsprechend anpassen):
+```
+net use Z: "https://DEINE-SUBDOMAIN.bitrix24.de/company/personal/user/1/disk/path/" /persistent:no /user:DEIN_BENUTZERNAME DEIN_PASSWORT
+```
+Funktioniert das nicht, liegt das Problem nicht am Script selbst, sondern an den Zugangsdaten, dem Pfad oder der Windows-WebDAV-Konfiguration (siehe oben).
+
+### Ich habe mich bei bitrix24 registriert und vergessen, den Gutschein direkt einzugeben - wie trage ich diesen nachträglich ein?
 Links bei der Leiste wo oben "Activity Stream" steht auf "Abonnement" klicken.  
 Falls das nicht direkt sichtbar ist, erst unten auf "Mehr" klicken.  
 Dann auf "Gutschein aktivieren" klicken.
 
-## Wie oft sollte man das Script ausführen, damit Bitrix24 Accounts sicher nicht gelöscht werden?
+### Wie oft sollte man das Script ausführen, damit Bitrix24 Accounts sicher nicht gelöscht werden?
 Mindestens einmal pro Woche.
 
-## Zählt ein Login per Bitrix24 App auch als Login?
+### Zählt ein Login per Bitrix24 App auch als Login?
 Ja aber wenn du dieses Script verwendest, brauchst du die Bitrix24 App nicht ;)
 
-## Wo kann ich sehen, wie viel Speicher ich insgesamt habe?
+### Wo kann ich sehen, wie viel Speicher ich insgesamt habe?
 Links bei der Leiste wo oben "Activity Stream" steht auf "Abonnement" klicken.  
 Falls das nicht direkt sichtbar ist, erst unten auf "Mehr" klicken.  
 Falls der Deal "100 GB gratis" war, solltest du dort "105 GB" stehen haben.  
 **Wichtig:** Dein System (z.B. Windows) zeigt unter Umständen andere Werte im Explorer an.
 
-## Wo finde ich meine Web-DAV Zugangsdaten, wenn ich mich mit dem Social Login (z.B. Facebook/Google) registriert habe?
+### Wo finde ich meine Web-DAV Zugangsdaten, wenn ich mich mit dem Social Login (z.B. Facebook/Google) registriert habe?
 E-Mail: Mein Profil -> E-Mail  
 Passwort: Mein Profil -> Passwörter -> Passwörter der Anwendungen -> Dokumente -> Sonstiges -> Passwort anfordern  
+
+### Funktioniert das Script unter Windows 11?
+Ja, das Script selbst nutzt keine veralteten oder entfernten Windows-Befehle und funktioniert unter Windows 11 genauso wie unter älteren Windows-Versionen (außer Windows XP, siehe oben).  
+Tritt trotzdem ein `Systemfehler 67` oder ein ähnlicher Verbindungsfehler auf, liegt das in der Praxis meist am **WebClient-Dienst** (siehe Abschnitt "Ich bekomme den Fehler `Systemfehler 67`" weiter oben) - dieser ist auf manchen Windows-10/11-Installationen nicht aktiv oder startet nicht automatisch.

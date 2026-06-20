@@ -2,7 +2,7 @@
 REM Main purpose: Keep Bitrix24.de Accounts alive: https://www.mydealz.de/deals/100gb-cloud-speicher-dauerhaft-gratis-dsgvo-konform-1232057
 
 :start
-title NetworkDriveChecker v.1.41 by over_nine_thousand
+title NetworkDriveChecker v.1.50 by over_nine_thousand
 
 REM recommended according to: http://steve-jansen.github.io/guides/windows-batch-scripting/part-2-variables.html
 SETLOCAL ENABLEEXTENSIONS
@@ -35,10 +35,10 @@ if %ERRORLEVEL% == 0 (
 )
 
 REM Check for write access and show warning if we do not have write access
-type NUL > !parent!!logfile_test_write_access_name!
-if exist !parent!!logfile_test_write_access_name! (
+type NUL > "!parent!!logfile_test_write_access_name!"
+if exist "!parent!!logfile_test_write_access_name!" (
 	REM Delete testfile again
-	DEL !parent!!logfile_test_write_access_name!
+	DEL "!parent!!logfile_test_write_access_name!"
 ) else (
 	cls
 	color 04
@@ -61,11 +61,11 @@ if exist !parent!!logfile_test_write_access_name! (
 )
 
 REM Check for old logfiles or first start
-if exist !parent!!logfile_name! (
+if exist "!parent!!logfile_name!" (
 	echo !separator!
 	echo Inhalt des letzten Logs:
 	echo !separator!
-	type !parent!!logfile_name!
+	type "!parent!!logfile_name!"
 ) else (
 	REM First start - display welcome message if wished by user
 	if defined display_welcome_message_on_first_start if "%display_welcome_message_on_first_start%" == "true" (
@@ -137,6 +137,9 @@ if not defined filename goto :generate_random_filename
 
 :login
 
+REM Basisname einmalig sichern, damit er sich nicht durch wiederholte Schleifendurchlaeufe veraendert
+SET "base_filename=%filename%"
+
 SET /A position=0
 SET /A user_readable_position=1
 SET /A position_of_last_element=%numberof_accounts%-1
@@ -147,8 +150,9 @@ SET failed_accounts=
 
 :AccountLoop
 
-REM Important for the loop to work correctly!
-setlocal enableDelayedExpansion
+REM Delayed expansion ist bereits global aktiv (siehe SETLOCAL am Scriptanfang) - kein erneutes
+REM SETLOCAL hier noetig. Ein wiederholtes SETLOCAL ohne passendes ENDLOCAL wuerde bei jedem
+REM Schleifendurchlauf den SETLOCAL-Stack von cmd.exe weiter anwachsen lassen.
 
 if %position% LSS %numberof_accounts% (
 	REM Clear screen after every loop if we're not in debug mode
@@ -157,10 +161,13 @@ if %position% LSS %numberof_accounts% (
 	REM Dateiname ist fuer jeden Durchgang minimal anders
 	call echo Pruefe Account: !user_readable_position! von !numberof_accounts! : !usernames[%position%]!
 	
-	REM Use different filename for each run
-	SET filename=!position!_!filename!
+	REM Use different filename for each run - basierend auf dem unveraenderten Basisnamen, nicht kumulativ!
+	SET "filename=!position!_!base_filename!"
 	SET full_webdav_path=!protocol!!subdomains[%position%]!.!domain!!relative_webdav_path!
 	if defined enable_debug_mode if "!enable_debug_mode!" == "true" echo Erstelle Laufwerk !driveletter! zu Pfad: !full_webdav_path!
+	REM Leeres Passwort abfangen - sonst wuerde 'net use' interaktiv nach dem Passwort fragen und das Script wuerde unsichtbar haengenbleiben (z.B. im Aufgabenplaner)
+	if not defined passwords[%position%] goto :error_empty_password
+	if "!passwords[%position%]!" == "" goto :error_empty_password
 	net use !driveletter! "!full_webdav_path!" /persistent:yes /user:!usernames[%position%]! !passwords[%position%]!>nul && (
 		REM Login was successful
 		REM Increase counter of failed accounts
@@ -210,9 +217,9 @@ if %position% LSS %numberof_accounts% (
 
 
 REM Delete old logfile
-if exist !parent!!logfile_name! del !parent!!logfile_name!
+if exist "!parent!!logfile_name!" del "!parent!!logfile_name!"
 REM Write new logfile
-@echo Letzte Ausfuehrung: %date% ^| %numberof_accounts% Accounts geprueft ^| Davon erfolgreich: %numberof_successful_accounts% ^| Davon fehlgeschlagen: !numberof_failed_accounts! >> !parent!!logfile_name!
+@echo Letzte Ausfuehrung: %date% ^| %numberof_accounts% Accounts geprueft ^| Davon erfolgreich: %numberof_successful_accounts% ^| Davon fehlgeschlagen: !numberof_failed_accounts! >> "!parent!!logfile_name!"
 
 REM Display results - clear screen if there were no errors
 if !numberof_failed_accounts! GEQ 1 (
@@ -263,16 +270,24 @@ echo Eventuell hast du einen Syntaxfehler verursacht.
 echo Gehe sicher dass du deine Zugangsdaten korrekt eintraegst^^!
 goto :bad_ending
 
+REM Leeres Passwort wuerde 'net use' dazu bringen interaktiv nachzufragen - das wuerde das Script unsichtbar haengenbleiben lassen
+:error_empty_password
+cls
+color 04
+echo Fehler: Leeres Passwort fuer Account !user_readable_position! ^(!usernames[%position%]!^) gefunden^^!
+echo Bitte trage in AccountSettings.cmd ein gueltiges Passwort fuer diesen Account ein.
+goto :bad_ending
+
 REM Benutzer hat vermutlich Syntaxfehler in den Arrays mit den Zugangsdaten
 :error_login_failures
 REM Write usernames of failed accounts in logfile
 
-@echo Fehlgeschlagene Accounts !failed_accounts! >> !parent!!logfile_name!
+@echo Fehlgeschlagene Accounts !failed_accounts! >> "!parent!!logfile_name!"
 REM ----------- Handling for too many failures START -----------
-if exist !logfile_failed_times_name! (
-	SET /P failedtimes=<!logfile_failed_times_name!
+if exist "!parent!!logfile_failed_times_name!" (
+	SET /P failedtimes=<"!parent!!logfile_failed_times_name!"
 	REM Delete old logfile as it will get replaced by the new one later
-	DEL !logfile_failed_times_name!
+	DEL "!parent!!logfile_failed_times_name!"
 ) else (
 	REM No logfile with recent value for 'failedtimes' ? Initialize variable only
 	SET /A failedtimes=0
@@ -284,10 +299,10 @@ SET "account_failure_text_2=Problematische Accounts: !failed_accounts!"
 
 REM Display error dialog if the script failed too many times in a row and the user wants to see this error dialog.
 if !failedtimes! GEQ !max_failures_until_error! if defined display_error_dialog_on_too_many_failures if "!display_error_dialog_on_too_many_failures!" == "true" (
-	msg !username! NetworkDriveChecker: !account_failure_text_1! !account_failure_text_2!
+	msg "!username!" NetworkDriveChecker: !account_failure_text_1! !account_failure_text_2!
 )
 REM Write new 'number of failures' to log
-@echo !failedtimes! >> !logfile_failed_times_name!
+@echo !failedtimes! >> "!parent!!logfile_failed_times_name!"
 REM ----------- Handling for too many failures END -----------
 
 if defined enable_debug_mode if "!enable_debug_mode!" == "false" cls
@@ -338,11 +353,11 @@ exit
 :nice_ending
 REM Everything went well :)
 REM Cleanup: Delete file which contains number of failed times as we only want this to trigger an errormessage if this script ends with errors several times in a row
-if exist !logfile_failed_times_name! (
+if exist "!parent!!logfile_failed_times_name!" (
 	if defined enable_debug_mode if "!enable_debug_mode!" == "true" (
 		echo Im letzten Durchgang passierten Fehler, aber in diesem nicht - loesche Fehler-Zaehler-Datei !logfile_failed_times_name!
 	)
-	del !logfile_failed_times_name!
+	del "!parent!!logfile_failed_times_name!"
 )
 if defined enable_debug_mode if "!enable_debug_mode!" == "true" (
 	REM Kein cls ausfuehren, da wir im debug-Modus sind

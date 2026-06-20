@@ -40,8 +40,6 @@ REM Wartezeit nach jeder ERFOLGREICHEN Account-Pruefung (ansonsten geht es sofor
 SET /A waittime_seconds_between_successful_account_checks=5
 
 REM Einstellungen special
-REM Zeige unter Windows XP keine Fehlermeldung nach dem Start sondern versuche es trotzdem (wird idR nicht funktionieren)
-SET force_allow_windows_xp=false
 REM Mit folgendem String werden Ausgaben manchmal voneinander getrennt
 SET separator=-------------------------------------------------------
 REM ----------------------------------------------- Einstellungen ENDE -----------------------------------------------
